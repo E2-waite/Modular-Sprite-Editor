@@ -1,10 +1,12 @@
 using UnityEngine;
 
-[System.Serializable]
-public class SpriteLayer : ScriptableObject
+namespace SpriteEditor.Data
 {
-    public string name = "New Layer";
-    public Sprite sprite = null;
-    public Color color = Color.white;
-    public bool visible = true;
+    [System.Serializable]
+    public class SpriteLayer : ScriptableObject
+    {
+        public Sprite sprite = null;
+        public Color color = Color.white;
+        public bool visible = true;
+    }
 }

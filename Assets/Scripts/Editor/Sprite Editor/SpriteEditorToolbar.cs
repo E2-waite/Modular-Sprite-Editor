@@ -3,85 +3,88 @@ using UnityEditor;
 using System;
 using System.Collections.Generic;
 
-public class SpriteEditorToolbar
+namespace SpriteEditor.Editor
 {
-    private static string lastDir = Application.dataPath;
-
-    public static void Draw(SpriteEditorWindow editor)
+    public class SpriteEditorToolbar
     {
-        EditorGUILayout.BeginHorizontal(EditorStyles.toolbar);
+        private static string lastDir = Application.dataPath;
 
-        Rect fileRect = GUILayoutUtility.GetRect(
-            new GUIContent("File"),
-            EditorStyles.toolbarDropDown,
-            GUILayout.Width(50));
-
-        if (EditorGUI.DropdownButton(
-            fileRect,
-            new GUIContent("File"),
-            FocusType.Passive,
-            EditorStyles.toolbarDropDown))
+        public static void Draw(SpriteEditorWindow editor)
         {
-            DrawFileMenu(fileRect, editor);
+            EditorGUILayout.BeginHorizontal(EditorStyles.toolbar);
+
+            Rect fileRect = GUILayoutUtility.GetRect(
+                new GUIContent("File"),
+                EditorStyles.toolbarDropDown,
+                GUILayout.Width(50));
+
+            if (EditorGUI.DropdownButton(
+                fileRect,
+                new GUIContent("File"),
+                FocusType.Passive,
+                EditorStyles.toolbarDropDown))
+            {
+                DrawFileMenu(fileRect, editor);
+            }
+
+            GUILayout.FlexibleSpace();
+
+            GUILayout.FlexibleSpace();
+
+            EditorGUILayout.EndHorizontal();
         }
 
-        GUILayout.FlexibleSpace();
+        static void DrawFileMenu(Rect buttonRect, SpriteEditorWindow editor)
+        {
+            GenericMenu menu = new GenericMenu();
 
-        GUILayout.FlexibleSpace();
+            menu.AddItem(
+                new GUIContent("New..."),
+                false,
+                () => New(editor));
 
-        EditorGUILayout.EndHorizontal();
-    }
+            menu.AddItem(
+                new GUIContent("Open..."),
+                false,
+                () => Open(editor));
 
-    static void DrawFileMenu(Rect buttonRect, SpriteEditorWindow editor)
-    {
-        GenericMenu menu = new GenericMenu();
-
-        menu.AddItem(
-            new GUIContent("New..."),
-            false,
-            () => New(editor));
-
-        menu.AddItem(
-            new GUIContent("Open..."),
-            false,
-            () => Open(editor));
-
-        menu.DropDown(buttonRect);
-    }
+            menu.DropDown(buttonRect);
+        }
 
 
-    static void New(SpriteEditorWindow editor)
-    {
-        Debug.Log("New");
+        static void New(SpriteEditorWindow editor)
+        {
+            Debug.Log("New");
 
-        string path = EditorUtility.SaveFilePanelInProject(
-            "Create Sprite Configuration",
-            "New Sprite Configuration",
-            "asset",
-            "Choose where to save the configuration.",
-            lastDir);
+            string path = EditorUtility.SaveFilePanelInProject(
+                "Create Sprite Configuration",
+                "New Sprite Configuration",
+                "asset",
+                "Choose where to save the configuration.",
+                lastDir);
 
-        if (string.IsNullOrEmpty(path))
-            return;
+            if (string.IsNullOrEmpty(path))
+                return;
 
-        lastDir = path;
+            lastDir = path;
 
-        editor.NewConfig(path);
-    }
+            editor.NewConfig(path);
+        }
 
 
-    static void Open(SpriteEditorWindow editor)
-    {
-        string path = EditorUtility.OpenFilePanel(
-                        "Open Sprite Configuration",
-                        lastDir,
-                        "asset");
+        static void Open(SpriteEditorWindow editor)
+        {
+            string path = EditorUtility.OpenFilePanel(
+                            "Open Sprite Configuration",
+                            lastDir,
+                            "asset");
 
-        if (string.IsNullOrEmpty(path))
-            return;
+            if (string.IsNullOrEmpty(path))
+                return;
 
-        lastDir = path;
+            lastDir = path;
 
-        editor.OpenConfig("Assets" + path.Substring(Application.dataPath.Length));
+            editor.OpenConfig("Assets" + path.Substring(Application.dataPath.Length));
+        }
     }
 }
