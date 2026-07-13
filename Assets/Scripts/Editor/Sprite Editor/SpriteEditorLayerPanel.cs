@@ -10,6 +10,8 @@ namespace SpriteEditor.Editor
         [SerializeField] private static Vector2 layerScroll;
         [SerializeField] private static Vector2 stateScroll;
 
+
+
         public static void Draw(SpriteEditorWindow window)
         {
             EditorGUILayout.BeginVertical(GUILayout.Width(220),
@@ -65,7 +67,7 @@ namespace SpriteEditor.Editor
             if (GUILayout.Button("Create") && window.Config != null)
             {
                 Undo.RecordObject(window.Config, "Create Sprite Layer");
-                window.Config.AddLayer(new SpriteLayer());
+                window.Config.AddLayer(new SpriteLayer("New Sprite Layer"));
                 window.selectedLayer = window.Config.LayerCount - 1;
                 EditorUtility.SetDirty(window.Config);
             }
