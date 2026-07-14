@@ -71,10 +71,10 @@ namespace SpriteEditor.Editor
 
             if (config != null)
             {
-                foreach (SpriteLayer layer in config.Layers)
+                for (int i = config.LayerCount - 1; i >= 0; i--)
                 {
+                    SpriteLayer layer = config.GetLayer(i);
                     if (layer == null || layer.sprite == null || !layer.visible) continue;
-
                     DrawSprite(layer.sprite, canvasRect, scale, layer.color);
                 }
             }

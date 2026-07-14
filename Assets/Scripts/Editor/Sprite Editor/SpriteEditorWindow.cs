@@ -1,4 +1,5 @@
 using UnityEditor;
+using UnityEditor.Callbacks;
 using UnityEngine;
 using SpriteEditor.Data;
 
@@ -11,6 +12,27 @@ namespace SpriteEditor.Editor
 
         public SpriteEditorConfig Config => config;
         [SerializeField] public int selectedLayer = -1;
+
+        [OnOpenAsset]
+        public static bool OnOpenAsset(int instanceId, int line)
+        {
+            SpriteEditorConfig openedConfig =
+                EditorUtility.InstanceIDToObject(instanceId) as SpriteEditorConfig;
+
+            if (openedConfig == null)
+                return false;
+
+            SpriteEditorWindow window =
+                GetWindow<SpriteEditorWindow>("Sprite Editor");
+
+            string path = AssetDatabase.GetAssetPath(openedConfig);
+
+            window.OpenConfig(path);
+            window.Show();
+            window.Focus();
+
+            return true;
+        }
 
         private void OnEnable()
         {
@@ -30,6 +52,8 @@ namespace SpriteEditor.Editor
         void OnGUI()
         {
             SpriteEditorToolbar.Draw(this);
+
+            if (config == null) return;
 
             EditorGUILayout.BeginHorizontal();
 

@@ -6,7 +6,7 @@ namespace SpriteEditor.Data
 {
     public class SpriteEditorConfig : ScriptableObject
     {
-        [SerializeField] private List<SpriteLayer> layers = new List<SpriteLayer>();
+        private List<SpriteLayer> layers = new List<SpriteLayer>();
         public int LayerCount => layers.Count;
         public IEnumerable<SpriteLayer> Layers => layers;
 
