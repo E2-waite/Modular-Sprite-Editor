@@ -1,29 +1,30 @@
 using UnityEditor;
 using UnityEditor.Callbacks;
 using UnityEngine;
-using SpriteEditor.Data;
+using Haztech.SpriteEditor.Data;
 
-namespace SpriteEditor.Editor
+namespace Haztech.SpriteEditor.Editor
 {
-    public class SpriteEditorWindow : EditorWindow
+    public class ToolWindow : EditorWindow
     {
-        [SerializeField] private SpriteEditorConfig config;
-        const string LastConfigKey = "SpriteEditor.LastConfig";
+        [SerializeField] private SpriteConfig config;
+        const string LastConfigKey = "ScriptEditor.LastConfig";
 
-        public SpriteEditorConfig Config => config;
+        public SpriteConfig SpriteConfig => config;
         [SerializeField] public int selectedLayer = -1;
+        [SerializeField] public int selectedState = -1;
 
         [OnOpenAsset]
         public static bool OnOpenAsset(int instanceId, int line)
         {
-            SpriteEditorConfig openedConfig =
-                EditorUtility.InstanceIDToObject(instanceId) as SpriteEditorConfig;
+            SpriteConfig openedConfig =
+                EditorUtility.InstanceIDToObject(instanceId) as SpriteConfig;
 
             if (openedConfig == null)
                 return false;
 
-            SpriteEditorWindow window =
-                GetWindow<SpriteEditorWindow>("Sprite Editor");
+            ToolWindow window =
+                GetWindow<ToolWindow>("Sprite Editor");
 
             string path = AssetDatabase.GetAssetPath(openedConfig);
 
@@ -39,33 +40,33 @@ namespace SpriteEditor.Editor
             string path = EditorPrefs.GetString(LastConfigKey, "");
             if (!string.IsNullOrEmpty(path))
             {
-                config = AssetDatabase.LoadAssetAtPath<SpriteEditorConfig>(path);
+                config = AssetDatabase.LoadAssetAtPath<SpriteConfig>(path);
             }
         }
 
         [MenuItem("Tools/Sprite Editor")]
         public static void ShowWindow()
         {
-            GetWindow<SpriteEditorWindow>("Sprite Editor");
+            GetWindow<ToolWindow>("Sprite Editor");
         }
 
         void OnGUI()
         {
-            SpriteEditorToolbar.Draw(this);
+            Toolbar.Draw(this);
 
             if (config == null) return;
 
             EditorGUILayout.BeginHorizontal();
 
-            SpriteEditorLayerPanel.Draw(this);
-            SpriteEditorDisplayPanel.Draw(this);
-            SpriteEditorPropertiesPanel.Draw(this);
+            LayerPanel.Draw(this);
+            DisplayPanel.Draw(this);
+            PropertiesPanel.Draw(this);
             EditorGUILayout.EndHorizontal();
         }
 
         public void NewConfig(string path)
         {
-            SpriteEditorConfig newConfig = ScriptableObject.CreateInstance<SpriteEditorConfig>();
+            SpriteConfig newConfig = ScriptableObject.CreateInstance<SpriteConfig>();
 
             // Sets previous config to ensure the same config opens after closing and re-opening
             EditorPrefs.SetString(LastConfigKey, path);
@@ -80,7 +81,7 @@ namespace SpriteEditor.Editor
         public void OpenConfig(string path)
         {
             EditorPrefs.SetString(LastConfigKey, path);
-            config = AssetDatabase.LoadAssetAtPath<SpriteEditorConfig>(path);
+            config = AssetDatabase.LoadAssetAtPath<SpriteConfig>(path);
         }
     }
 }

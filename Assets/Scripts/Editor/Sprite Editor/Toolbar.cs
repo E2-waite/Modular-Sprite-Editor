@@ -3,13 +3,13 @@ using UnityEditor;
 using System;
 using System.Collections.Generic;
 
-namespace SpriteEditor.Editor
+namespace Haztech.SpriteEditor.Editor
 {
-    public class SpriteEditorToolbar
+    public class Toolbar
     {
         private static string lastDir = Application.dataPath;
 
-        public static void Draw(SpriteEditorWindow editor)
+        public static void Draw(ToolWindow editor)
         {
             EditorGUILayout.BeginHorizontal(EditorStyles.toolbar);
 
@@ -34,7 +34,7 @@ namespace SpriteEditor.Editor
             EditorGUILayout.EndHorizontal();
         }
 
-        static void DrawFileMenu(Rect buttonRect, SpriteEditorWindow editor)
+        static void DrawFileMenu(Rect buttonRect, ToolWindow editor)
         {
             GenericMenu menu = new GenericMenu();
 
@@ -52,7 +52,7 @@ namespace SpriteEditor.Editor
         }
 
 
-        static void New(SpriteEditorWindow editor)
+        static void New(ToolWindow editor)
         {
             Debug.Log("New");
 
@@ -72,7 +72,7 @@ namespace SpriteEditor.Editor
         }
 
 
-        static void Open(SpriteEditorWindow editor)
+        static void Open(ToolWindow editor)
         {
             string path = EditorUtility.OpenFilePanel(
                             "Open Sprite Configuration",

@@ -1,15 +1,16 @@
+using System.Collections.Generic;
 using UnityEngine;
 
-namespace SpriteEditor.Data
+namespace Haztech.SpriteEditor.Data
 {
     [System.Serializable]
-    public class SpriteLayer : ScriptableObject
+    public class Layer : ScriptableObject
     {
         public Sprite sprite = null;
         public Color color = Color.white;
         public bool visible = true;
 
-        public SpriteLayer(string name)
+        public Layer(string name)
         {
             this.name = name;
         }

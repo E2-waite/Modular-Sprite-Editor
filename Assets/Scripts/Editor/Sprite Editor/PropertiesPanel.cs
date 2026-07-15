@@ -1,24 +1,24 @@
 using UnityEditor;
 using UnityEngine;
-using SpriteEditor.Data;
+using Haztech.SpriteEditor.Data;
 
-namespace SpriteEditor.Editor
+namespace Haztech.SpriteEditor.Editor
 {
-    public static class SpriteEditorPropertiesPanel
+    public static class PropertiesPanel
     {
-        public static void Draw(SpriteEditorWindow window)
+        public static void Draw(ToolWindow window)
         {
             EditorGUILayout.BeginVertical(EditorStyles.helpBox, GUILayout.Width(260));
 
             GUILayout.Label("Properties", EditorStyles.boldLabel);
 
-            SpriteEditorConfig config = window.Config;
+            SpriteConfig config = window.SpriteConfig;
 
             if (config != null && window.selectedLayer >= 0 && window.selectedLayer < config.LayerCount)
             {
                 Undo.RecordObject(config, "Edit Sprite Layer");
 
-                SpriteLayer layer = config.GetLayer(window.selectedLayer);
+                Layer layer = config.GetLayer(window.selectedLayer);
 
                 if (layer != null)
                 {

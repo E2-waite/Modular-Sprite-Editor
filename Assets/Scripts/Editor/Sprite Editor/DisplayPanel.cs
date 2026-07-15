@@ -1,12 +1,12 @@
 using UnityEditor;
 using UnityEngine;
-using SpriteEditor.Data;
+using Haztech.SpriteEditor.Data;
 
-namespace SpriteEditor.Editor
+namespace Haztech.SpriteEditor.Editor
 {
-    public static class SpriteEditorDisplayPanel
+    public static class DisplayPanel
     {
-        public static void Draw(SpriteEditorWindow window)
+        public static void Draw(ToolWindow window)
         {
             EditorGUILayout.BeginVertical();
 
@@ -23,9 +23,9 @@ namespace SpriteEditor.Editor
             previewRect,
             new Color(0.15f, 0.15f, 0.15f));
 
-            Vector2 canvasSize = GetCanvasSize(window.Config);
+            Vector2 canvasSize = GetCanvasSize(window.SpriteConfig);
 
-            DrawLayers(window.Config, previewRect, canvasSize);
+            DrawLayers(window.SpriteConfig, previewRect, canvasSize);
             EditorGUILayout.EndHorizontal();
 
 
@@ -37,13 +37,13 @@ namespace SpriteEditor.Editor
             EditorGUILayout.EndVertical();
         }
 
-        private static Vector2 GetCanvasSize(SpriteEditorConfig config)
+        private static Vector2 GetCanvasSize(SpriteConfig config)
         {
             Vector2 size = Vector2.zero;
 
             if (config != null)
             {
-                foreach (SpriteLayer layer in config.Layers)
+                foreach (Layer layer in config.Layers)
                 {
                     if (layer == null || layer.sprite == null) continue;
 
@@ -55,7 +55,7 @@ namespace SpriteEditor.Editor
             return size;
         }
 
-        private static void DrawLayers(SpriteEditorConfig config, Rect previewRect, Vector2 canvasSize)
+        private static void DrawLayers(SpriteConfig config, Rect previewRect, Vector2 canvasSize)
         {
             float scale = Mathf.Min(
             previewRect.width / canvasSize.x,
@@ -73,7 +73,7 @@ namespace SpriteEditor.Editor
             {
                 for (int i = config.LayerCount - 1; i >= 0; i--)
                 {
-                    SpriteLayer layer = config.GetLayer(i);
+                    Layer layer = config.GetLayer(i);
                     if (layer == null || layer.sprite == null || !layer.visible) continue;
                     DrawSprite(layer.sprite, canvasRect, scale, layer.color);
                 }
