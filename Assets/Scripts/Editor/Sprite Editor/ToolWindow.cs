@@ -15,18 +15,17 @@ namespace Haztech.SpriteEditor.Editor
         [SerializeField] public int selectedState = -1;
 
         [OnOpenAsset]
-        public static bool OnOpenAsset(int instanceId, int line)
+        public static bool OnOpenAsset(EntityId entityId, int line)
         {
+            string path = AssetDatabase.GetAssetPath(entityId);
+
             SpriteConfig openedConfig =
-                EditorUtility.InstanceIDToObject(instanceId) as SpriteConfig;
+                AssetDatabase.LoadAssetAtPath<SpriteConfig>(path);
 
             if (openedConfig == null)
                 return false;
 
-            ToolWindow window =
-                GetWindow<ToolWindow>("Sprite Editor");
-
-            string path = AssetDatabase.GetAssetPath(openedConfig);
+            ToolWindow window = GetWindow<ToolWindow>("Sprite Editor");
 
             window.OpenConfig(path);
             window.Show();
