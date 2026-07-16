@@ -2,8 +2,21 @@ using UnityEngine;
 namespace Haztech.SpriteEditor.Data
 {
     [System.Serializable]
-    public class State
+    public class StateData
     {
-        Direction[] directions = new Direction[(int)Directions8D.Max];
+        public SpriteData[] directions = new SpriteData[(int)Direction.Max];
+
+        public StateData()
+        {
+            for (int i = 0; i < (int)Direction.Max; i++)
+            {
+                if (directions[i] == null) directions[i] = new SpriteData();
+            }
+        }
+
+        public SpriteData GetData(Direction dir)
+        {
+            return directions[(int)dir];
+        }
     }
 }

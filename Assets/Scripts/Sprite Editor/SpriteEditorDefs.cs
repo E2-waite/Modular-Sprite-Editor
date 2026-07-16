@@ -10,7 +10,7 @@ namespace Haztech.SpriteEditor.Data
         Custom
     }
 
-    public enum Directions8D
+    public enum Direction
     {
         North,
         NorthEast,

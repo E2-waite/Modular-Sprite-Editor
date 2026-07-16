@@ -1,10 +1,11 @@
 using Haztech.SpriteEditor.Data;
 using UnityEditor;
 using UnityEngine;
+using static UnityEditorInternal.VersionControl.ListControl;
 
 namespace Haztech.SpriteEditor.Editor
 {
-    public static class LayerPanel
+    public static class SelectPanel
     {
         [SerializeField] private static Vector2 layerScroll;
         [SerializeField] private static Vector2 stateScroll;
@@ -15,11 +16,16 @@ namespace Haztech.SpriteEditor.Editor
                  GUILayout.ExpandHeight(true));
 
             float spacing = EditorGUIUtility.standardVerticalSpacing;
-            float availableHeight = window.position.height - 25f;
-            float sectionHeight = (availableHeight - spacing) * 0.5f;
+            float availableHeight = window.position.height - 160;
+            availableHeight -= DrawDirectionSelector(window);
 
 
-            DrawLayers(window, sectionHeight);
+            float sectionHeight = (availableHeight - spacing) * .5f;
+
+            GUILayout.Space(spacing);
+
+
+            DrawLayersList(window, sectionHeight);
 
             GUILayout.Space(spacing);
 
@@ -28,7 +34,83 @@ namespace Haztech.SpriteEditor.Editor
             EditorGUILayout.EndVertical();
         }
 
-        private static void DrawLayers(ToolWindow window, float height)
+        private static float DrawDirectionSelector(ToolWindow window)
+        {
+            Rect sectionRect = EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+            GUILayout.Label("Directions", EditorStyles.boldLabel);
+
+            Rect boxRect = EditorGUILayout.BeginVertical();
+            EditorGUI.DrawRect(boxRect, new Color(0.2f, 0.2f, 0.2f));
+
+            EditorGUILayout.BeginHorizontal();
+            GUILayout.FlexibleSpace();
+
+            if (GUILayout.Button("↖", GUILayout.Width(32), GUILayout.Height(32)))
+            {
+                window.selectedDir = Direction.NorthWest;
+            }
+
+            if (GUILayout.Button("↑", GUILayout.Width(32), GUILayout.Height(32)))
+            {
+                window.selectedDir = Direction.North;
+            }
+
+            if (GUILayout.Button("↗", GUILayout.Width(32), GUILayout.Height(32)))
+            {
+                window.selectedDir = Direction.NorthEast;
+            }
+            GUILayout.FlexibleSpace();
+
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.BeginHorizontal();
+            GUILayout.FlexibleSpace();
+
+            if (GUILayout.Button("←", GUILayout.Width(32), GUILayout.Height(32)))
+            {
+                window.selectedDir = Direction.West;
+            }
+
+
+            GUILayout.Space(34);
+
+            if (GUILayout.Button("→", GUILayout.Width(32), GUILayout.Height(32)))
+            {
+                window.selectedDir = Direction.East;
+            }
+            GUILayout.FlexibleSpace();
+
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.BeginHorizontal();
+            GUILayout.FlexibleSpace();
+
+            if (GUILayout.Button("↙", GUILayout.Width(32), GUILayout.Height(32)))
+            {
+                window.selectedDir = Direction.SouthWest;
+            }
+
+            if (GUILayout.Button("↓", GUILayout.Width(32), GUILayout.Height(32)))
+            {
+                window.selectedDir = Direction.South;
+            }
+
+            if (GUILayout.Button("↘", GUILayout.Width(32), GUILayout.Height(32)))
+            {
+                window.selectedDir = Direction.SouthEast;
+            }
+            GUILayout.FlexibleSpace();
+
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.EndVertical();
+
+            EditorGUILayout.EndVertical();
+
+            return sectionRect.height;
+        }
+
+        private static void DrawLayersList(ToolWindow window, float height)
         {
             EditorGUILayout.BeginVertical(EditorStyles.helpBox, GUILayout.Height(height));
             GUILayout.Label("Layers", EditorStyles.boldLabel);
@@ -65,18 +147,22 @@ namespace Haztech.SpriteEditor.Editor
             if (GUILayout.Button("Create") && window.SpriteConfig != null)
             {
                 Undo.RecordObject(window.SpriteConfig, "Create Sprite Layer");
-                window.SpriteConfig.AddLayer(new Layer("New Sprite Layer"));
+                window.SpriteConfig.AddLayer(new Layer("New Layer"));
                 window.selectedLayer = window.SpriteConfig.LayerCount - 1;
                 EditorUtility.SetDirty(window.SpriteConfig);
             }
 
-            if (GUILayout.Button("Remove") && window.SpriteConfig != null)
+            using (new EditorGUI.DisabledScope(window.SpriteConfig.LayerCount <= 1))
             {
-                Undo.RecordObject(window.SpriteConfig, "Remove Sprite Layer");
-                window.SpriteConfig.RemoveLayer(window.selectedLayer);
-                window.selectedLayer = window.SpriteConfig.LayerCount - 1;
-                EditorUtility.SetDirty(window.SpriteConfig);
+                if (GUILayout.Button("Remove") && window.SpriteConfig != null)
+                {
+                    Undo.RecordObject(window.SpriteConfig, "Remove Sprite Layer");
+                    window.SpriteConfig.RemoveLayer(window.selectedLayer);
+                    window.selectedLayer = window.SpriteConfig.LayerCount - 1;
+                    EditorUtility.SetDirty(window.SpriteConfig);
+                }
             }
+
 
             EditorGUILayout.EndHorizontal();
 
@@ -218,19 +304,21 @@ namespace Haztech.SpriteEditor.Editor
             if (GUILayout.Button("Create") && window.SpriteConfig != null)
             {
                 Undo.RecordObject(window.SpriteConfig, "Create Sprite State");
-                window.SpriteConfig.AddState(new StateConfig("New Sprite State"));
+                window.SpriteConfig.AddState(new StateConfig("New State"));
                 window.selectedState = window.SpriteConfig.StateCount - 1;
                 EditorUtility.SetDirty(window.SpriteConfig);
             }
 
-            if (GUILayout.Button("Remove") && window.SpriteConfig != null)
+            using (new EditorGUI.DisabledScope(window.SpriteConfig.StateCount <= 1))
             {
-                Undo.RecordObject(window.SpriteConfig, "Remove Sprite State");
-                window.SpriteConfig.RemoveState(window.selectedState);
-                window.selectedState = window.SpriteConfig.StateCount - 1;
-                EditorUtility.SetDirty(window.SpriteConfig);
+                if (GUILayout.Button("Remove") && window.SpriteConfig != null)
+                {
+                    Undo.RecordObject(window.SpriteConfig, "Remove Sprite State");
+                    window.SpriteConfig.RemoveState(window.selectedState);
+                    window.selectedState = window.SpriteConfig.StateCount - 1;
+                    EditorUtility.SetDirty(window.SpriteConfig);
+                }
             }
-
             EditorGUILayout.EndHorizontal();
 
 
@@ -242,7 +330,7 @@ namespace Haztech.SpriteEditor.Editor
             Rect rowRect = EditorGUILayout.GetControlRect(false, EditorGUIUtility.singleLineHeight);
             bool selected = window.selectedState == index;
 
-            StateConfig state = window.SpriteConfig.GetState(index);
+            StateConfig state = window.SpriteConfig.GetStateConfig(index);
             if (state == null) return;
 
             // Draw state rect

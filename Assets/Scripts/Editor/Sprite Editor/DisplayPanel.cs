@@ -8,54 +8,60 @@ namespace Haztech.SpriteEditor.Editor
     {
         public static void Draw(ToolWindow window)
         {
-            EditorGUILayout.BeginVertical();
-
+            EditorGUILayout.BeginVertical(EditorStyles.helpBox);
             GUILayout.Label("Preview", EditorStyles.boldLabel);
-            EditorGUILayout.BeginHorizontal(EditorStyles.helpBox);
 
-            Rect previewRect = GUILayoutUtility.GetRect(
-                                                300f,
-                                                300f,
-                                                GUILayout.ExpandWidth(true),
-                                                GUILayout.ExpandHeight(true));
+            EditorGUILayout.BeginHorizontal();
+
+            Rect previewRect = GUILayoutUtility.GetRect(300f, 300f, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
 
             EditorGUI.DrawRect(
             previewRect,
             new Color(0.15f, 0.15f, 0.15f));
 
-            Vector2 canvasSize = GetCanvasSize(window.SpriteConfig);
+            Vector2 canvasSize = GetCanvasSize(window);
 
-            DrawLayers(window.SpriteConfig, previewRect, canvasSize);
+            DrawLayers(window, previewRect, canvasSize);
             EditorGUILayout.EndHorizontal();
 
 
-            EditorGUILayout.BeginHorizontal(EditorStyles.helpBox, GUILayout.Height(200));
-            GUILayout.Label("Details", EditorStyles.boldLabel);
+            //EditorGUILayout.BeginVertical(EditorStyles.helpBox, GUILayout.Height(200));
+            //GUILayout.Label("Details", EditorStyles.boldLabel);
 
-            EditorGUILayout.EndHorizontal();
+            //DrawDetails(window);
+
+            //EditorGUILayout.EndVertical();
 
             EditorGUILayout.EndVertical();
         }
-
-        private static Vector2 GetCanvasSize(SpriteConfig config)
+         
+        private static Vector2 GetCanvasSize(ToolWindow window)
         {
             Vector2 size = Vector2.zero;
+
+            SpriteConfig config = window.SpriteConfig;
 
             if (config != null)
             {
                 foreach (Layer layer in config.Layers)
                 {
-                    if (layer == null || layer.sprite == null) continue;
+                    if (layer == null) continue;
 
-                    size.x = Mathf.Max(size.x, layer.sprite.rect.width);
-                    size.y = Mathf.Max(size.y, layer.sprite.rect.height);
+                    StateData state = layer.GetState(window.selectedState);
+                    if (state == null) continue;
+
+                    SpriteData data = state.GetData(window.selectedDir);
+                    if (data == null || data.sprite == null) continue;
+
+                    size.x = Mathf.Max(size.x, data.sprite.rect.width);
+                    size.y = Mathf.Max(size.y, data.sprite.rect.height);
                 }
             }
 
             return size;
         }
 
-        private static void DrawLayers(SpriteConfig config, Rect previewRect, Vector2 canvasSize)
+        private static void DrawLayers(ToolWindow window, Rect previewRect, Vector2 canvasSize)
         {
             float scale = Mathf.Min(
             previewRect.width / canvasSize.x,
@@ -69,13 +75,22 @@ namespace Haztech.SpriteEditor.Editor
                    displayedCanvasSize.x,
                    displayedCanvasSize.y);
 
+            SpriteConfig config = window.SpriteConfig;
+
             if (config != null)
             {
                 for (int i = config.LayerCount - 1; i >= 0; i--)
                 {
                     Layer layer = config.GetLayer(i);
-                    if (layer == null || layer.sprite == null || !layer.visible) continue;
-                    DrawSprite(layer.sprite, canvasRect, scale, layer.color);
+                    if (layer == null || !layer.visible) continue;
+
+                    StateData state = layer.GetState(window.selectedState);
+                    if (state == null) continue;
+
+                    SpriteData data = state.GetData(window.selectedDir);
+                    if (data == null || data.sprite == null) continue;
+
+                    DrawSprite(data.sprite, canvasRect, scale, layer.color);
                 }
             }
         }
@@ -108,6 +123,11 @@ namespace Haztech.SpriteEditor.Editor
                 true);
 
             GUI.color = previousColor;
+        }
+
+        static void DrawDetails(ToolWindow window)
+        {
+            window.selectedDir = (Direction)EditorGUILayout.EnumPopup("Direction Mode", window.selectedDir);
         }
     }
 }

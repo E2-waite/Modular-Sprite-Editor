@@ -11,8 +11,9 @@ namespace Haztech.SpriteEditor.Editor
         const string LastConfigKey = "ScriptEditor.LastConfig";
 
         public SpriteConfig SpriteConfig => config;
-        [SerializeField] public int selectedLayer = -1;
-        [SerializeField] public int selectedState = -1;
+        [SerializeField] public int selectedLayer = 0;
+        [SerializeField] public int selectedState = 0;
+        [SerializeField] public Direction selectedDir = Direction.South;
 
         [OnOpenAsset]
         public static bool OnOpenAsset(EntityId entityId, int line)
@@ -57,7 +58,7 @@ namespace Haztech.SpriteEditor.Editor
 
             EditorGUILayout.BeginHorizontal();
 
-            LayerPanel.Draw(this);
+            SelectPanel.Draw(this);
             DisplayPanel.Draw(this);
             PropertiesPanel.Draw(this);
             EditorGUILayout.EndHorizontal();
@@ -66,6 +67,9 @@ namespace Haztech.SpriteEditor.Editor
         public void NewConfig(string path)
         {
             SpriteConfig newConfig = ScriptableObject.CreateInstance<SpriteConfig>();
+
+            newConfig.AddLayer(new Layer("New Layer"));
+            newConfig.AddState(new StateConfig("New State"));
 
             // Sets previous config to ensure the same config opens after closing and re-opening
             EditorPrefs.SetString(LastConfigKey, path);

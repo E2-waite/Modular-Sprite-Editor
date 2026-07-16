@@ -54,9 +54,13 @@ namespace Haztech.SpriteEditor.Data
         public void AddState(StateConfig state)
         {
             states.Add(state);
+            foreach (Layer layer in layers)
+            {
+                layer.AddState(new StateData());
+            }
         }
 
-        public StateConfig GetState(int stateIndex)
+        public StateConfig GetStateConfig(int stateIndex)
         {
             if (stateIndex >= states.Count)
             {
@@ -72,21 +76,23 @@ namespace Haztech.SpriteEditor.Data
             if (stateIndex >= states.Count) return;
 
             states.RemoveAt(stateIndex);
+            foreach (Layer layer in layers)
+            {
+                layer.RemoveState(stateIndex);
+            }
         }
 
-        public void MoveStateDown(int index)
+        public SpriteData GetData(int layerId, int stateId, Direction dir)
         {
-            MoveState(index, 1);
-        }
+            Layer layer = layers[layerId];
 
-        public void MoveStateUp(int index)
-        {
-            MoveState(index, -1);
-        }
+            if (layer == null) return null;
 
-        private void MoveState(int index, int dir)
-        {
-            (states[index], states[index + dir]) = (states[index + dir], states[index]);
+            StateData state = layer.GetState(stateId);
+
+            if (state == null) return null;
+
+            return state.GetData(dir);
         }
     }
 }
