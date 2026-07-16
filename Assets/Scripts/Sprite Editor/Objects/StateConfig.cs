@@ -1,9 +1,14 @@
 using UnityEngine;
 
-public class StateConfig : ScriptableObject
+namespace Haztech.SpriteEditor.Data
 {
-    public StateConfig(string name)
+    [System.Serializable]
+    public class StateConfig
     {
-        this.name = name;
+        public string name;
+        public StateConfig(string name)
+        {
+            this.name = name;
+        }
     }
 }

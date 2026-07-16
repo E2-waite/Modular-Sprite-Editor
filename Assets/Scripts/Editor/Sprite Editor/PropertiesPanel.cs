@@ -28,11 +28,11 @@ namespace Haztech.SpriteEditor.Editor
 
             SpriteConfig config = window.SpriteConfig;
 
-            if (config != null && window.selectedLayer >= 0 && window.selectedLayer < config.LayerCount)
+            if (config != null && window.SpriteConfig.selectedLayer >= 0 && window.SpriteConfig.selectedLayer < config.LayerCount)
             {
                 Undo.RecordObject(config, "Edit Sprite Layer");
 
-                Layer layer = config.GetLayer(window.selectedLayer);
+                Layer layer = config.GetLayer(window.SpriteConfig.selectedLayer);
 
                 if (layer != null)
                 {
@@ -42,10 +42,10 @@ namespace Haztech.SpriteEditor.Editor
 
 
 
-                    StateData state = layer.GetState(window.selectedState);
+                    StateData state = layer.GetState(window.SpriteConfig.selectedState);
                     if (state != null)
                     {
-                        SpriteData data = state.GetData(window.selectedDir);
+                        SpriteData data = state.GetData(window.SpriteConfig.selectedDir);
                         data.sprite = (Sprite)EditorGUILayout.ObjectField("Sprite", data.sprite, typeof(Sprite), false);
                     }
                 }
@@ -63,11 +63,11 @@ namespace Haztech.SpriteEditor.Editor
 
             SpriteConfig config = window.SpriteConfig;
 
-            if (config != null && window.selectedLayer >= 0 && window.selectedLayer < config.LayerCount)
+            if (config != null && window.SpriteConfig.selectedLayer >= 0 && window.SpriteConfig.selectedLayer < config.LayerCount)
             {
                 Undo.RecordObject(config, "Edit Sprite State");
 
-                StateConfig state = config.GetStateConfig(window.selectedState);
+                StateConfig state = config.GetStateConfig(window.SpriteConfig.selectedState);
 
                 if (state != null)
                 {

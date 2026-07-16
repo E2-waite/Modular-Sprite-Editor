@@ -11,9 +11,7 @@ namespace Haztech.SpriteEditor.Editor
         const string LastConfigKey = "ScriptEditor.LastConfig";
 
         public SpriteConfig SpriteConfig => config;
-        [SerializeField] public int selectedLayer = 0;
-        [SerializeField] public int selectedState = 0;
-        [SerializeField] public Direction selectedDir = Direction.South;
+
 
         [OnOpenAsset]
         public static bool OnOpenAsset(EntityId entityId, int line)

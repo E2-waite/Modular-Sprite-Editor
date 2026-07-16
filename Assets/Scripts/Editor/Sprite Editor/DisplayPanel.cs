@@ -47,10 +47,10 @@ namespace Haztech.SpriteEditor.Editor
                 {
                     if (layer == null) continue;
 
-                    StateData state = layer.GetState(window.selectedState);
+                    StateData state = layer.GetState(window.SpriteConfig.selectedState);
                     if (state == null) continue;
 
-                    SpriteData data = state.GetData(window.selectedDir);
+                    SpriteData data = state.GetData(window.SpriteConfig.selectedDir);
                     if (data == null || data.sprite == null) continue;
 
                     size.x = Mathf.Max(size.x, data.sprite.rect.width);
@@ -84,10 +84,10 @@ namespace Haztech.SpriteEditor.Editor
                     Layer layer = config.GetLayer(i);
                     if (layer == null || !layer.visible) continue;
 
-                    StateData state = layer.GetState(window.selectedState);
+                    StateData state = layer.GetState(window.SpriteConfig.selectedState);
                     if (state == null) continue;
 
-                    SpriteData data = state.GetData(window.selectedDir);
+                    SpriteData data = state.GetData(window.SpriteConfig.selectedDir);
                     if (data == null || data.sprite == null) continue;
 
                     DrawSprite(data.sprite, canvasRect, scale, layer.color);
@@ -127,7 +127,7 @@ namespace Haztech.SpriteEditor.Editor
 
         static void DrawDetails(ToolWindow window)
         {
-            window.selectedDir = (Direction)EditorGUILayout.EnumPopup("Direction Mode", window.selectedDir);
+            window.SpriteConfig.selectedDir = (Direction)EditorGUILayout.EnumPopup("Direction Mode", window.SpriteConfig.selectedDir);
         }
     }
 }

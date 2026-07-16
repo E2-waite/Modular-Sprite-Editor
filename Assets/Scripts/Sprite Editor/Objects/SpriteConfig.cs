@@ -8,6 +8,11 @@ namespace Haztech.SpriteEditor.Data
     {
         private List<Layer> layers = new List<Layer>();
         private List<StateConfig> states = new List<StateConfig>();
+
+        public int selectedLayer = 0;
+        public int selectedState = 0;
+        public Direction selectedDir = Direction.South;
+
         public int LayerCount => layers.Count;
         public IEnumerable<Layer> Layers => layers;
         public int StateCount => states.Count;
@@ -15,6 +20,11 @@ namespace Haztech.SpriteEditor.Data
 
         public void AddLayer(Layer layer)
         {
+            for (int i = 0; i < states.Count; i++)
+            {
+                layer.AddState(new StateData());
+            }
+
             layers.Add(layer);
         }
 
@@ -56,7 +66,7 @@ namespace Haztech.SpriteEditor.Data
             states.Add(state);
             foreach (Layer layer in layers)
             {
-                layer.AddState(new StateData());
+                layer.AddState(new StateData(layer.states[selectedState]));
             }
         }
 
@@ -64,7 +74,7 @@ namespace Haztech.SpriteEditor.Data
         {
             if (stateIndex >= states.Count)
             {
-                Debug.LogWarning(": Invalid state index in editor config");
+                Debug.LogWarning("SpriteEditor: Invalid state index in editor config");
                 return null;
             }
 

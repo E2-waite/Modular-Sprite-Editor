@@ -20,7 +20,7 @@ namespace Haztech.SpriteEditor.Data
         SouthWest,
         West,
         NorthWest,
-        Max
+        Null
     }
 
     public enum Directions4D

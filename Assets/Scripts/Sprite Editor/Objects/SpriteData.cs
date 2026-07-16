@@ -6,5 +6,15 @@ namespace Haztech.SpriteEditor.Data
     public class SpriteData
     {
         public Sprite sprite = null;
+
+        public SpriteData()
+        {
+
+        }
+
+        public SpriteData(SpriteData other)
+        {
+            sprite = other.sprite;
+        }
     }
 }
