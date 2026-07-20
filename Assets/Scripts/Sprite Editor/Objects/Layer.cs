@@ -9,10 +9,27 @@ namespace Haztech.SpriteEditor.Data
         public Color color = Color.white;
         public int colorGroupId = -1;
         public List<StateData> states = new List<StateData>();
+        public LayerGroup group = null;
 
         public Layer(string name)
         {
             this.name = name;
+        }
+
+        public void SetGroup(LayerGroup newGroup)
+        {
+            ClearGroup();
+            group = newGroup;
+            group.AddLayer(this);
+        }
+
+        public void ClearGroup()
+        {
+            if (group != null)
+            {
+                group.RemoveLayer(this);
+                group = null;
+            }
         }
 
         public StateData GetState(int index)

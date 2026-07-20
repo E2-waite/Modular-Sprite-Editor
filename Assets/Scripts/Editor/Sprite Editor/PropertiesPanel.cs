@@ -63,6 +63,8 @@ namespace Haztech.SpriteEditor.Editor
                     Undo.RecordObject(config, "Edit Layer Group");
                     group.visible = EditorGUILayout.Toggle("Visible", group.visible);
                     group.name = EditorGUILayout.TextField("Name", group.name);
+
+                    GUILayout.Label(group.Layers.Count + " Layers");
                 }
 
             }

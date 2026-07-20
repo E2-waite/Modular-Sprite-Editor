@@ -167,14 +167,78 @@ namespace Haztech.SpriteEditor.Editor
         static int draggedLayer = -1;
         private static void DrawLayerRow(ToolWindow window, int index)
         {
-            Rect rowRect = EditorGUILayout.GetControlRect(false, EditorGUIUtility.singleLineHeight);
-            bool selected = window.SpriteConfig.selectedLayer == index;
-
             LayerObject layerObj = window.SpriteConfig.GetLayerObj(index);
             if (layerObj == null) return;
 
+            Rect rowRect = EditorGUILayout.GetControlRect(false, EditorGUIUtility.singleLineHeight);
+            bool selected = window.SpriteConfig.selectedLayer == index;
+
+            if (Event.current.type == EventType.MouseDown &&
+                rowRect.Contains(Event.current.mousePosition))
+            {
+                window.SpriteConfig.selectedLayer = index;
+                draggedLayer = index;
+                Event.current.Use();
+                window.Repaint();
+            }
+
+            bool grouping = false;
+
+            if (draggedLayer >= 0 && Event.current.type == EventType.MouseDrag)
+            {
+                if (index != draggedLayer && rowRect.Contains(Event.current.mousePosition))
+                {
+                    if (layerObj is Layer)
+                    {
+                        window.SpriteConfig.MoveLayer(draggedLayer, index);
+
+                        draggedLayer = index;
+                        window.SpriteConfig.selectedLayer = index;
+
+                        EditorUtility.SetDirty(window.SpriteConfig);
+                    }
+                    else if (layerObj is LayerGroup)
+                    {
+                        grouping = true;
+                    }
+
+                    window.Repaint();
+
+                    evt.Use();
+                }
+
+
+            }
+
+
+            if (draggedLayer >= 0 &&
+                Event.current.type == EventType.MouseUp && 
+                rowRect.Contains(Event.current.mousePosition))
+            {
+                if (index != draggedLayer)
+                {
+                    if (layerObj is LayerGroup group)
+                    {
+                        Layer layer = window.SpriteConfig.GetLayer(draggedLayer);
+                        layer.SetGroup(group);
+                        window.SpriteConfig.RemoveLayer(draggedLayer);
+                        EditorUtility.SetDirty(window.SpriteConfig);
+                    }
+                }
+
+                draggedLayer = -1;
+                Event.current.Use();
+                window.Repaint();
+            }
+
             // Draw layer rect
-            if (selected)
+            if (grouping)
+            {
+                EditorGUI.DrawRect(
+                    rowRect,
+                    new Color(0.24f, 0.48f, 1f));
+            }
+            else if (selected)
             {
                 EditorGUI.DrawRect(
                     rowRect,
@@ -253,41 +317,7 @@ namespace Haztech.SpriteEditor.Editor
             //    window.Repaint();
             //}
 
-            if (Event.current.type == EventType.MouseDown &&
-                rowRect.Contains(Event.current.mousePosition))
-            {
-                window.SpriteConfig.selectedLayer = index;
-                draggedLayer = index;
-                Event.current.Use();
-                window.Repaint();
-            }
-
-            if (draggedLayer >= 0 && Event.current.type == EventType.MouseDrag)
-            {
-                if (index != draggedLayer && rowRect.Contains(Event.current.mousePosition))
-                {
-                    window.SpriteConfig.MoveLayer(draggedLayer, index);
-
-                    draggedLayer = index;
-                    window.SpriteConfig.selectedLayer = index;
-
-                    EditorUtility.SetDirty(window.SpriteConfig);
-                    window.Repaint();
-
-                    evt.Use();
-                }
-
-
-            }
-
-
-            if (draggedLayer >= 0 &&
-                Event.current.type == EventType.MouseUp)
-            {
-                draggedLayer = -1;
-                Event.current.Use();
-                window.Repaint();
-            }
+            
         }
 
         private static void DrawStates(ToolWindow window, float height)

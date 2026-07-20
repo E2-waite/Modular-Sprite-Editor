@@ -7,7 +7,7 @@ namespace Haztech.SpriteEditor.Data
 {
     public class SpriteConfig : ScriptableObject
     {
-        [SerializeField] private List<LayerObject> layers = new List<LayerObject>();
+        [SerializeReference] private List<LayerObject> layers = new List<LayerObject>();
         [SerializeField] private List<StateConfig> states = new List<StateConfig>();
         [SerializeField] private List<ColorGroup> colorGroups = new List<ColorGroup>();
 
