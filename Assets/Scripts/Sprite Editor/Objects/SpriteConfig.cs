@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEditor.PackageManager;
 using UnityEngine;
+using static UnityEditor.Experimental.GraphView.GraphView;
 
 namespace Haztech.SpriteEditor.Data
 {
@@ -19,6 +20,43 @@ namespace Haztech.SpriteEditor.Data
         public int StateCount => states.Count;
         public IEnumerable<StateConfig> States => states;
         public List<ColorGroup> ColorGroups => colorGroups;
+
+        public Sprite GetSprite(int layerId)
+        {
+            if (layerId >= 0 && layerId < layers.Count)
+            {
+                Layer layer = layers[layerId];
+
+                if (layer == null) return null;
+
+                StateData state = layer.GetState(selectedState);
+
+                if (state == null) return null;
+
+                SpriteData spriteData = state.GetData(selectedDir);
+
+                return spriteData.sprite;
+            }
+
+            return null;
+        }
+
+        public Color GetColor(int layerId)
+        {
+            if (layerId >= 0 && layerId < layers.Count)
+            {
+                Layer layer = layers[layerId];
+
+                if (layer == null) return Color.white;
+
+                if (layer.colorGroupId >= 0 && layer.colorGroupId < colorGroups.Count)
+                    return colorGroups[layer.colorGroupId].color;
+                else
+                    return layer.color;
+            }
+            return Color.white;
+
+        }
 
 
         public void AddLayer(Layer layer)
