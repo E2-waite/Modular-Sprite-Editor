@@ -129,10 +129,18 @@ namespace Haztech.SpriteEditor.Editor
 
             EditorGUILayout.BeginHorizontal();
 
-            if (GUILayout.Button("Create") && window.SpriteConfig != null)
+            if (GUILayout.Button("New Layer") && window.SpriteConfig != null)
             {
                 Undo.RecordObject(window.SpriteConfig, "Create Sprite Layer");
                 window.SpriteConfig.AddLayer(new Layer("New Layer"));
+                window.SpriteConfig.selectedLayer = window.SpriteConfig.LayerCount - 1;
+                EditorUtility.SetDirty(window.SpriteConfig);
+            }
+
+            if (GUILayout.Button("New Group") && window.SpriteConfig != null)
+            {
+                Undo.RecordObject(window.SpriteConfig, "Create Sprite Group");
+                window.SpriteConfig.AddGroup(new LayerGroup("New Group"));
                 window.SpriteConfig.selectedLayer = window.SpriteConfig.LayerCount - 1;
                 EditorUtility.SetDirty(window.SpriteConfig);
             }
@@ -141,7 +149,7 @@ namespace Haztech.SpriteEditor.Editor
             {
                 if (GUILayout.Button("Remove") && window.SpriteConfig != null)
                 {
-                    Undo.RecordObject(window.SpriteConfig, "Remove Sprite Layer");
+                    Undo.RecordObject(window.SpriteConfig, "Remove");
                     window.SpriteConfig.RemoveLayer(window.SpriteConfig.selectedLayer);
                     window.SpriteConfig.selectedLayer = window.SpriteConfig.LayerCount - 1;
                     EditorUtility.SetDirty(window.SpriteConfig);
@@ -160,8 +168,8 @@ namespace Haztech.SpriteEditor.Editor
             Rect rowRect = EditorGUILayout.GetControlRect(false, EditorGUIUtility.singleLineHeight);
             bool selected = window.SpriteConfig.selectedLayer == index;
 
-            Layer layer = window.SpriteConfig.GetLayer(index);
-            if (layer == null) return;
+            LayerObject layerObj = window.SpriteConfig.GetLayerObj(index);
+            if (layerObj == null) return;
 
             // Draw layer rect
             if (selected)
@@ -205,7 +213,7 @@ namespace Haztech.SpriteEditor.Editor
                 rowRect.height);
 
             GUIContent eyeIcon = EditorGUIUtility.IconContent(
-                                    layer.visible
+                                    layerObj.visible
                                         ? "animationvisibilitytoggleon"
                                         : "animationvisibilitytoggleoff");
 
@@ -213,7 +221,7 @@ namespace Haztech.SpriteEditor.Editor
                 {
                     Undo.RecordObject(window.SpriteConfig, "Toggle Layer Visibility");
 
-                    layer.visible = !layer.visible;
+                    layerObj.visible = !layerObj.visible;
 
                     EditorUtility.SetDirty(window.SpriteConfig);
                     window.Repaint();
@@ -225,7 +233,7 @@ namespace Haztech.SpriteEditor.Editor
                         labelRect.y,
                         labelRect.width - 8f,
                         labelRect.height),
-                        layer.name);
+                        layerObj.name);
 
             if (index > 0 && GUI.Button(upRect, EditorGUIUtility.IconContent("scrollup"), EditorStyles.iconButton))
             {

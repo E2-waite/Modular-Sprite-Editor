@@ -7,7 +7,7 @@ namespace Haztech.SpriteEditor.Data
 {
     public class SpriteConfig : ScriptableObject
     {
-        [SerializeField] private List<Layer> layers = new List<Layer>();
+        [SerializeField] private List<LayerObject> layers = new List<LayerObject>();
         [SerializeField] private List<StateConfig> states = new List<StateConfig>();
         [SerializeField] private List<ColorGroup> colorGroups = new List<ColorGroup>();
 
@@ -16,16 +16,16 @@ namespace Haztech.SpriteEditor.Data
         public Direction selectedDir = Direction.South;
 
         public int LayerCount => layers.Count;
-        public IEnumerable<Layer> Layers => layers;
+        //public IEnumerable<Layer> Layers => layers;
         public int StateCount => states.Count;
         public IEnumerable<StateConfig> States => states;
         public List<ColorGroup> ColorGroups => colorGroups;
 
-        public Sprite GetSprite(int layerId)
+        public Sprite GetSprite(int layerId, Direction dir = Direction.Null)
         {
             if (layerId >= 0 && layerId < layers.Count)
             {
-                Layer layer = layers[layerId];
+                Layer layer = (Layer)layers[layerId];
 
                 if (layer == null) return null;
 
@@ -33,7 +33,7 @@ namespace Haztech.SpriteEditor.Data
 
                 if (state == null) return null;
 
-                SpriteData spriteData = state.GetData(selectedDir);
+                SpriteData spriteData = state.GetData(dir == Direction.Null ? selectedDir : dir);
 
                 return spriteData.sprite;
             }
@@ -45,7 +45,7 @@ namespace Haztech.SpriteEditor.Data
         {
             if (layerId >= 0 && layerId < layers.Count)
             {
-                Layer layer = layers[layerId];
+                Layer layer = (Layer)layers[layerId];
 
                 if (layer == null) return Color.white;
 
@@ -69,6 +69,11 @@ namespace Haztech.SpriteEditor.Data
             layers.Add(layer);
         }
 
+        public void AddGroup(LayerGroup group)
+        {
+            layers.Add(group);
+        }
+
         public Layer GetLayer(int layerIndex)
         {
             if (layerIndex >= layers.Count)
@@ -77,7 +82,19 @@ namespace Haztech.SpriteEditor.Data
                 return null;
             }
 
-            return layers[layerIndex];
+            if (layers[layerIndex] is Layer layer) return layer;
+            return null;
+        }
+
+        public LayerObject GetLayerObj(int index)
+        {
+            if (index >= layers.Count)
+            {
+                Debug.LogWarning(": Invalid layer index in editor config");
+                return null;
+            }
+
+            return layers[index];
         }
 
         public void RemoveLayer(int layerIndex)
@@ -138,7 +155,7 @@ namespace Haztech.SpriteEditor.Data
 
         public SpriteData GetData(int layerId, int stateId, Direction dir)
         {
-            Layer layer = layers[layerId];
+            Layer layer = (Layer)layers[layerId];
 
             if (layer == null) return null;
 

@@ -44,5 +44,19 @@ namespace Haztech.SpriteEditor.Runtime
             }
             renderers.Clear();
         }
+
+        public void UpdateDirection(Direction dir)
+        {
+            for (int i = 0; i < config.LayerCount; i++)
+            {
+                Layer layer = config.GetLayer(i);
+                if (layer == null) continue;
+
+                SpriteRenderer rend = renderers[i];
+
+                if (rend != null)
+                    rend.sprite = config.GetSprite(i);
+            }
+        }
     }
 }

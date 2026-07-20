@@ -29,12 +29,14 @@ namespace Haztech.SpriteEditor.Editor
 
             if (config != null && window.SpriteConfig.selectedLayer >= 0 && window.SpriteConfig.selectedLayer < config.LayerCount)
             {
-                Undo.RecordObject(config, "Edit Sprite Layer");
 
-                Layer layer = config.GetLayer(window.SpriteConfig.selectedLayer);
 
-                if (layer != null)
+                LayerObject layerObj = config.GetLayerObj(window.SpriteConfig.selectedLayer);
+
+                if (layerObj is Layer layer)
                 {
+                    Undo.RecordObject(config, "Edit Layer");
+
                     layer.visible = EditorGUILayout.Toggle("Visible", layer.visible);
                     layer.name = EditorGUILayout.TextField("Name", layer.name);
 
@@ -57,6 +59,12 @@ namespace Haztech.SpriteEditor.Editor
                         SpriteData data = state.GetData(window.SpriteConfig.selectedDir);
                         data.sprite = (Sprite)EditorGUILayout.ObjectField("Sprite", data.sprite, typeof(Sprite), false);
                     }
+                }
+                else if (layerObj is LayerGroup group)
+                {
+                    Undo.RecordObject(config, "Edit Layer Group");
+                    group.visible = EditorGUILayout.Toggle("Visible", group.visible);
+                    group.name = EditorGUILayout.TextField("Name", group.name);
                 }
 
             }

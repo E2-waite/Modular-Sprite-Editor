@@ -43,8 +43,9 @@ namespace Haztech.SpriteEditor.Editor
 
             if (config != null)
             {
-                foreach (Layer layer in config.Layers)
+                for (int i = 0; i < config.LayerCount; i++)
                 {
+                    Layer layer = config.GetLayer(i);
                     if (layer == null) continue;
 
                     StateData state = layer.GetState(window.SpriteConfig.selectedState);

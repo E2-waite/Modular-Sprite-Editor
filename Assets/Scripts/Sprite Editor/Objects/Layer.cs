@@ -4,12 +4,10 @@ using UnityEngine;
 namespace Haztech.SpriteEditor.Data
 {
     [System.Serializable]
-    public class Layer
+    public class Layer : LayerObject
     {
-        public string name;
         public Color color = Color.white;
         public int colorGroupId = -1;
-        public bool visible = true;
         public List<StateData> states = new List<StateData>();
 
         public Layer(string name)
