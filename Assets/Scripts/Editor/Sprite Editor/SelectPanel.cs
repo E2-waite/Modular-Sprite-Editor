@@ -163,6 +163,8 @@ namespace Haztech.SpriteEditor.Editor
             GUILayout.EndVertical();
         }
 
+        static Event evt = Event.current;
+        static int draggedLayer = -1;
         private static void DrawLayerRow(ToolWindow window, int index)
         {
             Rect rowRect = EditorGUILayout.GetControlRect(false, EditorGUIUtility.singleLineHeight);
@@ -194,22 +196,22 @@ namespace Haztech.SpriteEditor.Editor
                 buttonSize,
                 rowRect.height);
 
-            Rect downRect = new Rect(
-                rowRect.xMax - buttonSize - padding,
-                rowRect.y,
-                buttonSize,
-                rowRect.height);
+            //Rect downRect = new Rect(
+            //    rowRect.xMax - buttonSize - padding,
+            //    rowRect.y,
+            //    buttonSize,
+            //    rowRect.height);
 
-            Rect upRect = new Rect(
-                downRect.x - buttonSize - padding,
-                rowRect.y,
-                buttonSize,
-                rowRect.height);
+            //Rect upRect = new Rect(
+            //    downRect.x - buttonSize - padding,
+            //    rowRect.y,
+            //    buttonSize,
+            //    rowRect.height);
 
             Rect labelRect = new Rect(
                 eyeRect.xMax + 4f,
                 rowRect.y,
-                upRect.x - eyeRect.xMax - 8f,
+                rowRect.width - eyeRect.xMax - 8f,
                 rowRect.height);
 
             GUIContent eyeIcon = EditorGUIUtility.IconContent(
@@ -235,26 +237,54 @@ namespace Haztech.SpriteEditor.Editor
                         labelRect.height),
                         layerObj.name);
 
-            if (index > 0 && GUI.Button(upRect, EditorGUIUtility.IconContent("scrollup"), EditorStyles.iconButton))
-            {
-                window.SpriteConfig.MoveLayerUp(index);
-                window.SpriteConfig.selectedLayer--;
-                EditorUtility.SetDirty(window.SpriteConfig);
-                window.Repaint();
-            }
+            //if (index > 0 && GUI.Button(upRect, EditorGUIUtility.IconContent("scrollup"), EditorStyles.iconButton))
+            //{
+            //    window.SpriteConfig.MoveLayerUp(index);
+            //    window.SpriteConfig.selectedLayer--;
+            //    EditorUtility.SetDirty(window.SpriteConfig);
+            //    window.Repaint();
+            //}
 
-            if (index < window.SpriteConfig.LayerCount - 1 && GUI.Button(downRect, EditorGUIUtility.IconContent("scrolldown"), EditorStyles.iconButton))
-            {
-                window.SpriteConfig.MoveLayerDown(index);
-                window.SpriteConfig.selectedLayer++;
-                EditorUtility.SetDirty(window.SpriteConfig);
-                window.Repaint();
-            }
+            //if (index < window.SpriteConfig.LayerCount - 1 && GUI.Button(downRect, EditorGUIUtility.IconContent("scrolldown"), EditorStyles.iconButton))
+            //{
+            //    window.SpriteConfig.MoveLayerDown(index);
+            //    window.SpriteConfig.selectedLayer++;
+            //    EditorUtility.SetDirty(window.SpriteConfig);
+            //    window.Repaint();
+            //}
 
             if (Event.current.type == EventType.MouseDown &&
                 rowRect.Contains(Event.current.mousePosition))
             {
                 window.SpriteConfig.selectedLayer = index;
+                draggedLayer = index;
+                Event.current.Use();
+                window.Repaint();
+            }
+
+            if (draggedLayer >= 0 && Event.current.type == EventType.MouseDrag)
+            {
+                if (index != draggedLayer && rowRect.Contains(Event.current.mousePosition))
+                {
+                    window.SpriteConfig.MoveLayer(draggedLayer, index);
+
+                    draggedLayer = index;
+                    window.SpriteConfig.selectedLayer = index;
+
+                    EditorUtility.SetDirty(window.SpriteConfig);
+                    window.Repaint();
+
+                    evt.Use();
+                }
+
+
+            }
+
+
+            if (draggedLayer >= 0 &&
+                Event.current.type == EventType.MouseUp)
+            {
+                draggedLayer = -1;
                 Event.current.Use();
                 window.Repaint();
             }

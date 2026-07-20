@@ -29,8 +29,6 @@ namespace Haztech.SpriteEditor.Editor
 
             if (config != null && window.SpriteConfig.selectedLayer >= 0 && window.SpriteConfig.selectedLayer < config.LayerCount)
             {
-
-
                 LayerObject layerObj = config.GetLayerObj(window.SpriteConfig.selectedLayer);
 
                 if (layerObj is Layer layer)

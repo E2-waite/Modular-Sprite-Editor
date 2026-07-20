@@ -106,17 +106,19 @@ namespace Haztech.SpriteEditor.Data
 
         public void MoveLayerDown(int index)
         {
-            MoveLayer(index, 1);
+            MoveLayer(index, index + 1);
         }
 
         public void MoveLayerUp(int index)
         {
-            MoveLayer(index, -1);
+            MoveLayer(index, index - 1);
         }
 
-        private void MoveLayer(int index, int dir)
+        public void MoveLayer(int index, int toIndex)
         {
-            (layers[index], layers[index + dir]) = (layers[index + dir], layers[index]);
+            LayerObject layerObj = layers[index];
+            layers.RemoveAt(index);
+            layers.Insert(toIndex, layerObj);
         }
 
         public void AddState(StateConfig state)
