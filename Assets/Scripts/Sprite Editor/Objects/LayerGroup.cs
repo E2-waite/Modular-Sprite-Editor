@@ -6,12 +6,16 @@ namespace Haztech.SpriteEditor.Data
     [System.Serializable]
     public class LayerGroup : LayerObject
     {
-        [SerializeField] private List<Layer> layers = new List<Layer>();
+        private SpriteConfig config;
+        public bool expanded = false;
+        [SerializeReference] private List<Layer> layers = new List<Layer>();
         public List<Layer> Layers => layers;
-        public LayerGroup(string name)
+        public LayerGroup(string name, SpriteConfig config)
         {
             this.name = name;
+            this.config = config;
         }
+
         public void AddLayer(Layer layer)
         {
             if (!layers.Contains(layer))
@@ -20,7 +24,8 @@ namespace Haztech.SpriteEditor.Data
 
         public void RemoveLayer(Layer layer)
         {
-            layers.Remove(layer);
+            if (layer != null && layers != null)
+                layers.Remove(layer);
         }
 
         public void RemoveLayer(int index)
@@ -33,6 +38,12 @@ namespace Haztech.SpriteEditor.Data
         {
             if (index < layers.Count) return layers[index];
             return null;
+        }
+
+        public void ToggleExpand()
+        {
+            expanded = !expanded;
+            config?.RefeshExpandedList();
         }
     }
 }

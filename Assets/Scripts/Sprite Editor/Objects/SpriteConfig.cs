@@ -7,25 +7,29 @@ namespace Haztech.SpriteEditor.Data
 {
     public class SpriteConfig : ScriptableObject
     {
-        [SerializeReference] private List<LayerObject> layers = new List<LayerObject>();
+        [SerializeReference] private List<LayerObject> layerObjects = new List<LayerObject>();
         [SerializeField] private List<StateConfig> states = new List<StateConfig>();
         [SerializeField] private List<ColorGroup> colorGroups = new List<ColorGroup>();
+        [SerializeReference] private List<LayerObject> expanded = new List<LayerObject>();
+
+
 
         public int selectedLayer = 0;
         public int selectedState = 0;
         public Direction selectedDir = Direction.South;
 
-        public int LayerCount => layers.Count;
+        public int LayerCount => layerObjects.Count;
         //public IEnumerable<Layer> Layers => layers;
+        public List<LayerObject> ExpandedLayers => expanded;
         public int StateCount => states.Count;
         public IEnumerable<StateConfig> States => states;
         public List<ColorGroup> ColorGroups => colorGroups;
 
         public Sprite GetSprite(int layerId, Direction dir = Direction.Null)
         {
-            if (layerId >= 0 && layerId < layers.Count)
+            if (layerId >= 0 && layerId < layerObjects.Count)
             {
-                Layer layer = (Layer)layers[layerId];
+                Layer layer = (Layer)layerObjects[layerId];
 
                 if (layer == null) return null;
 
@@ -43,9 +47,9 @@ namespace Haztech.SpriteEditor.Data
 
         public Color GetColor(int layerId)
         {
-            if (layerId >= 0 && layerId < layers.Count)
+            if (layerId >= 0 && layerId < layerObjects.Count)
             {
-                Layer layer = (Layer)layers[layerId];
+                Layer layer = (Layer)layerObjects[layerId];
 
                 if (layer == null) return Color.white;
 
@@ -66,65 +70,83 @@ namespace Haztech.SpriteEditor.Data
                 layer.AddState(new StateData());
             }
 
-            layers.Add(layer);
+            layerObjects.Add(layer);
+
+            RefeshExpandedList();
         }
 
         public void AddGroup(LayerGroup group)
         {
-            layers.Add(group);
+            layerObjects.Add(group);
+            RefeshExpandedList();
         }
 
         public Layer GetLayer(int layerIndex)
         {
-            if (layerIndex >= layers.Count)
+            if (layerIndex >= expanded.Count)
             {
                 Debug.LogWarning(": Invalid layer index in editor config");
                 return null;
             }
 
-            if (layers[layerIndex] is Layer layer) return layer;
+            if (expanded[layerIndex] is Layer layer) return layer;
             return null;
         }
 
         public LayerObject GetLayerObj(int index)
         {
-            if (index >= layers.Count)
+            if (index >= layerObjects.Count)
             {
                 Debug.LogWarning(": Invalid layer index in editor config");
                 return null;
             }
 
-            return layers[index];
+            return layerObjects[index];
         }
 
         public void RemoveLayer(int layerIndex)
         {
-            if (layerIndex >= layers.Count) return;
+            if (layerIndex >= layerObjects.Count) return;
 
-            layers.RemoveAt(layerIndex);
+            layerObjects.RemoveAt(layerIndex);
+
+            RefeshExpandedList();
+        }
+
+        public void RemoveLayer(LayerObject layerObj)
+        {
+            layerObjects.Remove(layerObj);
+
+            RefeshExpandedList();
         }
 
         public void MoveLayerDown(int index)
         {
             MoveLayer(index, index + 1);
+
+            RefeshExpandedList();
         }
 
         public void MoveLayerUp(int index)
         {
             MoveLayer(index, index - 1);
+
+            RefeshExpandedList();
         }
 
         public void MoveLayer(int index, int toIndex)
         {
-            LayerObject layerObj = layers[index];
-            layers.RemoveAt(index);
-            layers.Insert(toIndex, layerObj);
+            LayerObject layerObj = layerObjects[index];
+            layerObjects.RemoveAt(index);
+            layerObjects.Insert(toIndex, layerObj);
+
+            RefeshExpandedList();
         }
 
         public void AddState(StateConfig state)
         {
             states.Add(state);
-            foreach (Layer layer in layers)
+            foreach (Layer layer in layerObjects)
             {
                 if (selectedState >= 0 && selectedState < layer.states.Count)
                     layer.AddState(new StateData(layer.states[selectedState]));
@@ -149,7 +171,7 @@ namespace Haztech.SpriteEditor.Data
             if (stateIndex >= states.Count) return;
 
             states.RemoveAt(stateIndex);
-            foreach (Layer layer in layers)
+            foreach (Layer layer in layerObjects)
             {
                 layer.RemoveState(stateIndex);
             }
@@ -157,7 +179,7 @@ namespace Haztech.SpriteEditor.Data
 
         public SpriteData GetData(int layerId, int stateId, Direction dir)
         {
-            Layer layer = (Layer)layers[layerId];
+            Layer layer = (Layer)layerObjects[layerId];
 
             if (layer == null) return null;
 
@@ -166,6 +188,42 @@ namespace Haztech.SpriteEditor.Data
             if (state == null) return null;
 
             return state.GetData(dir);
+        }
+
+        public void AddLayerToGroup(Layer layer, LayerGroup group)
+        {
+            if (layer == null || group == null) return;
+
+            layerObjects.Remove(layer);
+
+            layer.SetGroup(group);
+
+            RefeshExpandedList();
+        }
+
+        public void RefeshExpandedList()
+        {
+            expanded.Clear();
+
+            foreach (LayerObject layerObj in layerObjects)
+            {
+                if (layerObj is Layer layer)
+                {
+                    expanded.Add(layer);
+                }
+                else if (layerObj is LayerGroup group)
+                {
+                    expanded.Add(group);
+                    
+                    if (group.expanded)
+                    {
+                        foreach (Layer groupLayer in group.Layers)
+                        {
+                            expanded.Add(groupLayer);
+                        }
+                    }
+                }
+            }
         }
     }
 }

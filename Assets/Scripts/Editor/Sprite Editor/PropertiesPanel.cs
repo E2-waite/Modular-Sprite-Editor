@@ -27,9 +27,9 @@ namespace Haztech.SpriteEditor.Editor
 
             SpriteConfig config = window.SpriteConfig;
 
-            if (config != null && window.SpriteConfig.selectedLayer >= 0 && window.SpriteConfig.selectedLayer < config.LayerCount)
+            if (config != null && window.SpriteConfig.selectedLayer >= 0 && window.SpriteConfig.selectedLayer < config.ExpandedLayers.Count)
             {
-                LayerObject layerObj = config.GetLayerObj(window.SpriteConfig.selectedLayer);
+                LayerObject layerObj = config.ExpandedLayers[window.SpriteConfig.selectedLayer];
 
                 if (layerObj is Layer layer)
                 {
@@ -80,9 +80,11 @@ namespace Haztech.SpriteEditor.Editor
 
             if (config != null)
             {
-                Layer layer = config.GetLayer(window.SpriteConfig.selectedLayer);
+                LayerObject layerObj = config.ExpandedLayers[window.SpriteConfig.selectedLayer];
 
-                if (layer != null)
+
+
+                if (layerObj != null && layerObj is Layer layer)
                 {
                     string[] options = new string[config.ColorGroups.Count + 1];
                     options[0] = "None";

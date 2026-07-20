@@ -80,9 +80,13 @@ namespace Haztech.SpriteEditor.Editor
 
             if (config != null)
             {
-                for (int i = config.LayerCount - 1; i >= 0; i--)
+                for (int i = config.ExpandedLayers.Count - 1; i >= 0; i--)
                 {
-                    Layer layer = config.GetLayer(i);
+                    LayerObject layerObj = config.ExpandedLayers[i];
+
+                    if (layerObj is LayerGroup) continue;
+
+                    Layer layer = (Layer)layerObj;
                     if (layer == null || !layer.visible) continue;
 
                     StateData state = layer.GetState(window.SpriteConfig.selectedState);

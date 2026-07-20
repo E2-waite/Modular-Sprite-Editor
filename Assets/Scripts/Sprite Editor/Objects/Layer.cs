@@ -6,14 +6,16 @@ namespace Haztech.SpriteEditor.Data
     [System.Serializable]
     public class Layer : LayerObject
     {
+        private SpriteConfig config;
         public Color color = Color.white;
         public int colorGroupId = -1;
         public List<StateData> states = new List<StateData>();
-        public LayerGroup group = null;
-
-        public Layer(string name)
+        [SerializeField] private LayerGroup group = null;
+        public bool InGroup => group != null;
+        public Layer(string name, SpriteConfig config)
         {
             this.name = name;
+            this.config = config;
         }
 
         public void SetGroup(LayerGroup newGroup)
