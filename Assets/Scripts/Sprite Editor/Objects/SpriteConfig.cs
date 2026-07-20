@@ -6,8 +6,9 @@ namespace Haztech.SpriteEditor.Data
 {
     public class SpriteConfig : ScriptableObject
     {
-        private List<Layer> layers = new List<Layer>();
-        private List<StateConfig> states = new List<StateConfig>();
+        [SerializeField] private List<Layer> layers = new List<Layer>();
+        [SerializeField] private List<StateConfig> states = new List<StateConfig>();
+        [SerializeField] private List<ColorGroup> colorGroups = new List<ColorGroup>();
 
         public int selectedLayer = 0;
         public int selectedState = 0;
@@ -17,6 +18,8 @@ namespace Haztech.SpriteEditor.Data
         public IEnumerable<Layer> Layers => layers;
         public int StateCount => states.Count;
         public IEnumerable<StateConfig> States => states;
+        public List<ColorGroup> ColorGroups => colorGroups;
+
 
         public void AddLayer(Layer layer)
         {
@@ -66,7 +69,10 @@ namespace Haztech.SpriteEditor.Data
             states.Add(state);
             foreach (Layer layer in layers)
             {
-                layer.AddState(new StateData(layer.states[selectedState]));
+                if (selectedState >= 0 && selectedState < layer.states.Count)
+                    layer.AddState(new StateData(layer.states[selectedState]));
+                else
+                    layer.AddState(new StateData());
             }
         }
 

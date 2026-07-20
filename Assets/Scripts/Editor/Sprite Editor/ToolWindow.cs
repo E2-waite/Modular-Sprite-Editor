@@ -60,6 +60,9 @@ namespace Haztech.SpriteEditor.Editor
             DisplayPanel.Draw(this);
             PropertiesPanel.Draw(this);
             EditorGUILayout.EndHorizontal();
+
+            if (config != null)
+                EditorUtility.SetDirty(config);
         }
 
         public void NewConfig(string path)

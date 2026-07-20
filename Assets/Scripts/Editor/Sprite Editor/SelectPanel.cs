@@ -50,9 +50,9 @@ namespace Haztech.SpriteEditor.Editor
 
             EditorGUILayout.BeginHorizontal();
             GUILayout.FlexibleSpace();
-            DrawDirButton(window, "←", Direction.SouthWest);
+            DrawDirButton(window, "←", Direction.West);
             DrawDirButton(window, "", Direction.Null);
-            DrawDirButton(window, "→", Direction.SouthEast);
+            DrawDirButton(window, "→", Direction.East);
             GUILayout.FlexibleSpace();
             EditorGUILayout.EndHorizontal();
 
@@ -79,10 +79,19 @@ namespace Haztech.SpriteEditor.Editor
             }
             else
             {
+                Color old = GUI.backgroundColor;
+
+                if (window.SpriteConfig.selectedDir == dir)
+                {
+                    GUI.backgroundColor = new Color(0.35f, 0.6f, 1f);
+                }
+
                 if (GUILayout.Button(icon, GUILayout.Width(32), GUILayout.Height(32)))
                 {
                     window.SpriteConfig.selectedDir = dir;
                 }
+
+                GUI.backgroundColor = old;
             }
         }
 

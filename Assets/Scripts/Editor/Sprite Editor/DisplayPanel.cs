@@ -90,7 +90,12 @@ namespace Haztech.SpriteEditor.Editor
                     SpriteData data = state.GetData(window.SpriteConfig.selectedDir);
                     if (data == null || data.sprite == null) continue;
 
-                    DrawSprite(data.sprite, canvasRect, scale, layer.color);
+                    ColorGroup colorGroup = null;
+
+                    if (layer.colorGroupId >= 0 && layer.colorGroupId < config.ColorGroups.Count)
+                        colorGroup = config.ColorGroups[layer.colorGroupId];
+
+                    DrawSprite(data.sprite, canvasRect, scale, colorGroup == null ? layer.color : colorGroup.color);
                 }
             }
         }

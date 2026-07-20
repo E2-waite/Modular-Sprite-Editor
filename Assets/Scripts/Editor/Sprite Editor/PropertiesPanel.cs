@@ -1,6 +1,5 @@
 using Haztech.SpriteEditor.Data;
 using UnityEditor;
-using UnityEditor.PackageManager.UI;
 using UnityEngine;
 
 namespace Haztech.SpriteEditor.Editor
@@ -38,8 +37,18 @@ namespace Haztech.SpriteEditor.Editor
                 {
                     layer.visible = EditorGUILayout.Toggle("Visible", layer.visible);
                     layer.name = EditorGUILayout.TextField("Name", layer.name);
-                    layer.color = EditorGUILayout.ColorField("Color", layer.color);
 
+                    DrawColor(window);
+
+                    ColorGroup colorGroup = null;
+
+                    if (layer.colorGroupId >= 0 && layer.colorGroupId < config.ColorGroups.Count) 
+                        colorGroup = config.ColorGroups[layer.colorGroupId];
+
+                    if (colorGroup == null)
+                        layer.color = EditorGUILayout.ColorField("Color", layer.color);
+                    else
+                        colorGroup.color = EditorGUILayout.ColorField("Group Color", colorGroup.color);
 
 
                     StateData state = layer.GetState(window.SpriteConfig.selectedState);
@@ -50,11 +59,44 @@ namespace Haztech.SpriteEditor.Editor
                     }
                 }
 
-                EditorUtility.SetDirty(config);
             }
             EditorGUILayout.EndVertical();
         }
 
+
+        private static void DrawColor(ToolWindow window)
+        {
+            EditorGUILayout.BeginHorizontal();
+
+            SpriteConfig config = window.SpriteConfig;
+
+            if (config != null)
+            {
+                Layer layer = config.GetLayer(window.SpriteConfig.selectedLayer);
+
+                if (layer != null)
+                {
+                    string[] options = new string[config.ColorGroups.Count + 1];
+                    options[0] = "None";
+
+                    for (int i = 0; i < config.ColorGroups.Count; i++)
+                    {
+                        options[i + 1] = (i + 1).ToString() + ": " + config.ColorGroups[i].name;
+                    }
+
+                    layer.colorGroupId = EditorGUILayout.Popup(
+                                        layer.colorGroupId + 1,
+                                        options
+                                    ) - 1;
+
+                    if (GUILayout.Button("+", GUILayout.Width(EditorGUIUtility.singleLineHeight), GUILayout.Height(EditorGUIUtility.singleLineHeight)))
+                    {
+                        config.ColorGroups.Add(new ColorGroup());
+                    }
+                }
+            }
+            EditorGUILayout.EndHorizontal();
+        }
         private static void DrawStateProperties(ToolWindow window, float height)
         {
             EditorGUILayout.BeginVertical(EditorStyles.helpBox, GUILayout.Height(height));
