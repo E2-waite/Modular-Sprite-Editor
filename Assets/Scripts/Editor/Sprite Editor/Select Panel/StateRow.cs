@@ -8,7 +8,7 @@ namespace Haztech.SpriteEditor.Editor
     {
         public static void Draw(int index)
         {
-            SpriteConfig config = ToolWindow.Instance.SpriteConfig;
+            SpriteConfig config = Window.Instance.SpriteConfig;
 
             Rect rowRect = EditorGUILayout.GetControlRect(false, EditorGUIUtility.singleLineHeight);
             bool selected = config.selectedState == index;
@@ -70,7 +70,7 @@ namespace Haztech.SpriteEditor.Editor
                 config.MoveLayerUp(index);
                 config.selectedState--;
                 EditorUtility.SetDirty(config);
-                ToolWindow.Instance.Repaint();
+                Window.Instance.Repaint();
             }
 
             if (index < config.StateCount - 1 && GUI.Button(downRect, EditorGUIUtility.IconContent("scrolldown"), EditorStyles.iconButton))
@@ -78,7 +78,7 @@ namespace Haztech.SpriteEditor.Editor
                 config.MoveLayerDown(index);
                 config.selectedState++;
                 EditorUtility.SetDirty(config);
-                ToolWindow.Instance.Repaint();
+                Window.Instance.Repaint();
             }
 
             if (Event.current.type == EventType.MouseDown &&
@@ -86,7 +86,7 @@ namespace Haztech.SpriteEditor.Editor
             {
                 config.selectedState = index;
                 Event.current.Use();
-                ToolWindow.Instance.Repaint();
+                Window.Instance.Repaint();
             }
         }
     }

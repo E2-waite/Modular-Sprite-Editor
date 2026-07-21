@@ -1,18 +1,14 @@
-using UnityEngine;
 using UnityEditor;
-using System;
-using System.Collections.Generic;
+using UnityEngine;
 
 namespace Haztech.SpriteEditor.Editor
 {
-    public class Toolbar
+    public static class ToolbarFileMenu
     {
         private static string lastDir = Application.dataPath;
 
-        public static void Draw(ToolWindow editor)
+        public static void Draw()
         {
-            EditorGUILayout.BeginHorizontal(EditorStyles.toolbar);
-
             Rect fileRect = GUILayoutUtility.GetRect(
                 new GUIContent("File"),
                 EditorStyles.toolbarDropDown,
@@ -24,35 +20,29 @@ namespace Haztech.SpriteEditor.Editor
                 FocusType.Passive,
                 EditorStyles.toolbarDropDown))
             {
-                DrawFileMenu(fileRect, editor);
+                DrawFileMenu(fileRect);
             }
-
-            GUILayout.FlexibleSpace();
-
-            GUILayout.FlexibleSpace();
-
-            EditorGUILayout.EndHorizontal();
         }
 
-        static void DrawFileMenu(Rect buttonRect, ToolWindow editor)
+        private static void DrawFileMenu(Rect buttonRect)
         {
             GenericMenu menu = new GenericMenu();
 
             menu.AddItem(
                 new GUIContent("New..."),
                 false,
-                () => New(editor));
+                () => New());
 
             menu.AddItem(
                 new GUIContent("Open..."),
                 false,
-                () => Open(editor));
+                () => Open());
 
             menu.DropDown(buttonRect);
         }
 
 
-        static void New(ToolWindow editor)
+        private static void New()
         {
             Debug.Log("New");
 
@@ -68,11 +58,11 @@ namespace Haztech.SpriteEditor.Editor
 
             lastDir = path;
 
-            editor.NewConfig(path);
+            Window.Instance.NewConfig(path);
         }
 
 
-        static void Open(ToolWindow editor)
+        private static void Open()
         {
             string path = EditorUtility.OpenFilePanel(
                             "Open Sprite Configuration",
@@ -84,7 +74,7 @@ namespace Haztech.SpriteEditor.Editor
 
             lastDir = path;
 
-            editor.OpenConfig("Assets" + path.Substring(Application.dataPath.Length));
+            Window.Instance.OpenConfig("Assets" + path.Substring(Application.dataPath.Length));
         }
     }
 }

@@ -13,7 +13,7 @@ namespace Haztech.SpriteEditor.Editor
                  GUILayout.ExpandHeight(true));
 
             float spacing = EditorGUIUtility.standardVerticalSpacing;
-            float availableHeight = ToolWindow.Instance.position.height - 160;
+            float availableHeight = Window.Instance.position.height - 160;
             availableHeight -= DirectionSelector.Draw();
 
 

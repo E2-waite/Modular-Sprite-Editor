@@ -56,14 +56,14 @@ namespace Haztech.SpriteEditor.Editor
         }
 
         private static int draggedId = -1;
-        private static ToolWindow toolWindow;
+        private static Window toolWindow;
         private static SpriteConfig config;
 
         public static void Draw(int index)
         {
-            if (ToolWindow.Instance == null) return;
-            toolWindow = ToolWindow.Instance;
-            config = ToolWindow.Instance.SpriteConfig;
+            if (Window.Instance == null) return;
+            toolWindow = Window.Instance;
+            config = Window.Instance.SpriteConfig;
             if (config == null) return;
             LayerObject layerObj = config.ExpandedLayers[index];
             if (layerObj == null) return;

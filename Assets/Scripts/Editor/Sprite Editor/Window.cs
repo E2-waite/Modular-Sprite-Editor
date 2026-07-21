@@ -6,14 +6,14 @@ using UnityEngine;
 
 namespace Haztech.SpriteEditor.Editor
 {
-    public class ToolWindow : EditorWindow
+    public class Window : EditorWindow
     {
         [SerializeField] private SpriteConfig config;
         const string LastConfigKey = "ScriptEditor.LastConfig";
 
         public SpriteConfig SpriteConfig => config;
 
-        public static ToolWindow Instance;
+        public static Window Instance;
 
         [OnOpenAsset]
         public static bool OnOpenAsset(EntityId entityId, int line)
@@ -26,7 +26,7 @@ namespace Haztech.SpriteEditor.Editor
             if (openedConfig == null)
                 return false;
 
-            Instance = GetWindow<ToolWindow>("Sprite Editor");
+            Instance = GetWindow<Window>("Sprite Editor");
 
             Instance.OpenConfig(path);
             Instance.Show();
@@ -47,12 +47,12 @@ namespace Haztech.SpriteEditor.Editor
         [MenuItem("Tools/Sprite Editor")]
         public static void ShowWindow()
         {
-            Instance = GetWindow<ToolWindow>("Sprite Editor");
+            Instance = GetWindow<Window>("Sprite Editor");
         }
 
         void OnGUI()
         {
-            Toolbar.Draw(this);
+            Toolbar.Draw();
 
             if (config == null) return;
 

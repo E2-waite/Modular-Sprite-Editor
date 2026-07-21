@@ -4,15 +4,16 @@ using UnityEngine;
 
 namespace Haztech.SpriteEditor.Editor
 {
-    public static class StateList
+    public static class LayerList
     {
         [SerializeField] private static Vector2 scroll;
+
         public static void Draw(float height)
         {
-            SpriteConfig config = ToolWindow.Instance.SpriteConfig;
+            SpriteConfig config = Window.Instance.SpriteConfig;
 
             EditorGUILayout.BeginVertical(EditorStyles.helpBox, GUILayout.Height(height));
-            GUILayout.Label("States", EditorStyles.boldLabel);
+            GUILayout.Label("Layers", EditorStyles.boldLabel);
 
             DrawList(config);
 
@@ -30,11 +31,11 @@ namespace Haztech.SpriteEditor.Editor
 
             scroll = EditorGUILayout.BeginScrollView(scroll);
 
-            if (config != null && config.StateCount > 0)
+            if (config != null && config.ExpandedLayers.Count > 0)
             {
-                for (int i = 0; i < config.StateCount; i++)
+                for (int i = 0; i < config.ExpandedLayers.Count; i++)
                 {
-                    StateRow.Draw(i);
+                    LayerRow.Draw(i);
                 }
                 GUI.backgroundColor = Color.white;
             }
@@ -45,24 +46,34 @@ namespace Haztech.SpriteEditor.Editor
         private static void DrawButtons(SpriteConfig config)
         {
             EditorGUILayout.BeginHorizontal();
-            if (GUILayout.Button("Create") && config != null)
+
+            if (GUILayout.Button("New Layer") && config != null)
             {
-                Undo.RecordObject(config, "Create Sprite State");
-                config.AddState(new StateConfig("New State"));
-                config.selectedState = config.StateCount - 1;
+                Undo.RecordObject(config, "Create Sprite Layer");
+                config.AddLayer(new Layer("New Layer", config));
+                config.selectedLayer = config.ExpandedLayers.Count - 1;
                 EditorUtility.SetDirty(config);
             }
 
-            using (new EditorGUI.DisabledScope(config.StateCount <= 1))
+            if (GUILayout.Button("New Group") && config != null)
+            {
+                Undo.RecordObject(config, "Create Sprite Group");
+                config.AddGroup(new LayerGroup("New Group", config));
+                config.selectedLayer = config.ExpandedLayers.Count - 1;
+                EditorUtility.SetDirty(config);
+            }
+
+            using (new EditorGUI.DisabledScope(config.ExpandedLayers.Count <= 1))
             {
                 if (GUILayout.Button("Remove") && config != null)
                 {
-                    Undo.RecordObject(config, "Remove Sprite State");
-                    config.RemoveState(config.selectedState);
-                    config.selectedState = config.StateCount - 1;
+                    Undo.RecordObject(config, "Remove");
+                    config.RemoveLayer(config.ExpandedLayers[config.selectedLayer]);
+                    config.selectedLayer = config.ExpandedLayers.Count - 1;
                     EditorUtility.SetDirty(config);
                 }
             }
+
             EditorGUILayout.EndHorizontal();
         }
     }

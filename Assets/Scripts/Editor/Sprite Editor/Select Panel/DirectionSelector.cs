@@ -46,7 +46,7 @@ namespace Haztech.SpriteEditor.Editor
             {
                 Color old = GUI.backgroundColor;
 
-                SpriteConfig config = ToolWindow.Instance.SpriteConfig;
+                SpriteConfig config = Window.Instance.SpriteConfig;
 
                 if (config.selectedDir == dir)
                 {

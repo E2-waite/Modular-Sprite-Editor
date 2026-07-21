@@ -39,7 +39,7 @@ namespace Haztech.SpriteEditor.Editor
         {
             Vector2 size = Vector2.zero;
 
-            SpriteConfig config = ToolWindow.Instance.SpriteConfig;
+            SpriteConfig config = Window.Instance.SpriteConfig;
 
             if (config != null)
             {
@@ -48,10 +48,10 @@ namespace Haztech.SpriteEditor.Editor
                     Layer layer = config.GetLayer(i);
                     if (layer == null) continue;
 
-                    StateData state = layer.GetState(ToolWindow.Instance.SpriteConfig.selectedState);
+                    StateData state = layer.GetState(Window.Instance.SpriteConfig.selectedState);
                     if (state == null) continue;
 
-                    SpriteData data = state.GetData(ToolWindow.Instance.SpriteConfig.selectedDir);
+                    SpriteData data = state.GetData(Window.Instance.SpriteConfig.selectedDir);
                     if (data == null || data.sprite == null) continue;
 
                     size.x = Mathf.Max(size.x, data.sprite.rect.width);
@@ -76,7 +76,7 @@ namespace Haztech.SpriteEditor.Editor
                    displayedCanvasSize.x,
                    displayedCanvasSize.y);
 
-            SpriteConfig config = ToolWindow.Instance.SpriteConfig;
+            SpriteConfig config = Window.Instance.SpriteConfig;
 
             if (config != null)
             {
@@ -89,10 +89,10 @@ namespace Haztech.SpriteEditor.Editor
                     Layer layer = (Layer)layerObj;
                     if (layer == null || !layer.visible) continue;
 
-                    StateData state = layer.GetState(ToolWindow.Instance.SpriteConfig.selectedState);
+                    StateData state = layer.GetState(Window.Instance.SpriteConfig.selectedState);
                     if (state == null) continue;
 
-                    SpriteData data = state.GetData(ToolWindow.Instance.SpriteConfig.selectedDir);
+                    SpriteData data = state.GetData(Window.Instance.SpriteConfig.selectedDir);
                     if (data == null || data.sprite == null) continue;
 
                     ColorGroup colorGroup = null;
@@ -137,7 +137,7 @@ namespace Haztech.SpriteEditor.Editor
 
         static void DrawDetails()
         {
-            ToolWindow.Instance.SpriteConfig.selectedDir = (Direction)EditorGUILayout.EnumPopup("Direction Mode", ToolWindow.Instance.SpriteConfig.selectedDir);
+            Window.Instance.SpriteConfig.selectedDir = (Direction)EditorGUILayout.EnumPopup("Direction Mode", Window.Instance.SpriteConfig.selectedDir);
         }
     }
 }
