@@ -1,6 +1,7 @@
+using Haztech.SpriteEditor.Data;
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
-using Haztech.SpriteEditor.Data;
 
 namespace Haztech.SpriteEditor.Editor
 {
@@ -43,9 +44,10 @@ namespace Haztech.SpriteEditor.Editor
 
             if (config != null)
             {
-                for (int i = 0; i < config.LayerCount; i++)
+                List<Layer> layers = config.GetLayers();
+                for (int i = 0; i < layers.Count; i++)
                 {
-                    Layer layer = config.GetLayer(i);
+                    Layer layer = layers[i];
                     if (layer == null) continue;
 
                     StateData state = layer.GetState(Window.Instance.SpriteConfig.selectedState);
@@ -80,29 +82,43 @@ namespace Haztech.SpriteEditor.Editor
 
             if (config != null)
             {
-                for (int i = config.ExpandedLayers.Count - 1; i >= 0; i--)
+                for (int i = config.LayerCount; i >= 0; i--)
                 {
-                    LayerObject layerObj = config.ExpandedLayers[i];
+                    LayerObject layerObj = config.GetLayerObj(i);
 
-                    if (layerObj is LayerGroup) continue;
+                    if (layerObj is LayerGroup group)
+                    {
+                        if (!group.visible) continue;
 
-                    Layer layer = (Layer)layerObj;
-                    if (layer == null || !layer.visible) continue;
-
-                    StateData state = layer.GetState(Window.Instance.SpriteConfig.selectedState);
-                    if (state == null) continue;
-
-                    SpriteData data = state.GetData(Window.Instance.SpriteConfig.selectedDir);
-                    if (data == null || data.sprite == null) continue;
-
-                    ColorGroup colorGroup = null;
-
-                    if (layer.colorGroupId >= 0 && layer.colorGroupId < config.ColorGroups.Count)
-                        colorGroup = config.ColorGroups[layer.colorGroupId];
-
-                    DrawSprite(data.sprite, canvasRect, scale, colorGroup == null ? layer.color : colorGroup.color);
+                        foreach(Layer layer in group.Layers)
+                        {
+                            if (!layer.visible) continue;
+                            DrawLayer(layer, config, canvasRect, scale);
+                        }
+                    }
+                    else if (layerObj is Layer layer)
+                    {
+                        if (!layer.visible) continue;
+                        DrawLayer(layer, config, canvasRect, scale);
+                    }             
                 }
             }
+        }
+
+        private static void DrawLayer(Layer layer, SpriteConfig config, Rect rect, float scale)
+        {
+            StateData state = layer.GetState(Window.Instance.SpriteConfig.selectedState);
+            if (state == null) return;
+
+            SpriteData data = state.GetData(Window.Instance.SpriteConfig.selectedDir);
+            if (data == null || data.sprite == null) return;
+
+            ColorGroup colorGroup = null;
+
+            if (layer.colorGroupId >= 0 && layer.colorGroupId < config.ColorGroups.Count)
+                colorGroup = config.ColorGroups[layer.colorGroupId];
+
+            DrawSprite(data.sprite, rect, scale, colorGroup == null ? layer.color : colorGroup.color);
         }
 
         private static void DrawSprite(Sprite sprite, Rect rect, float scale, Color color)

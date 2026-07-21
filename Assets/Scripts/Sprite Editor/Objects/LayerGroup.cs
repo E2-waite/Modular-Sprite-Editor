@@ -40,6 +40,15 @@ namespace Haztech.SpriteEditor.Data
             return null;
         }
 
+        public void Expand(bool expand)
+        {
+            if (expanded != expand)
+            {
+                expanded = expand;
+                config?.RefeshExpandedList();
+            }
+        }
+
         public void ToggleExpand()
         {
             expanded = !expanded;

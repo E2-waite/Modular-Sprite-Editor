@@ -16,15 +16,34 @@ namespace Haztech.SpriteEditor.Editor
             public Rect moveDown;
             public Rect moveUp;
             public Rect label;
-            public RowRects(Rect row)
+            public Rect expand;
+
+            public RowRects(Rect row, bool isGroup)
             {
                 this.row = row;
 
+                float currentX = row.x + padding;
+
+                if (isGroup)
+                {
+                    expand = new Rect(
+                        currentX,
+                        row.y,
+                        buttonSize,
+                        row.height);
+
+                    currentX = expand.xMax;
+                }
+                else
+                {
+                    expand = Rect.zero;
+                }
+
                 visibility = new Rect(
-                     row.x + padding,
-                     row.y,
-                     buttonSize,
-                     row.height);
+                    currentX,
+                    row.y,
+                    buttonSize,
+                    row.height);
 
                 moveDown = new Rect(
                     row.xMax - buttonSize - padding,
@@ -41,14 +60,15 @@ namespace Haztech.SpriteEditor.Editor
                 label = new Rect(
                     visibility.xMax + 4f,
                     row.y,
-                    row.width - visibility.xMax - 8f,
+                    moveUp.x - visibility.xMax - 8f,
                     row.height);
             }
 
             public bool MouseOverButton(Vector2 mousePos) =>
                 visibility.Contains(mousePos) ||
                 moveUp.Contains(mousePos) ||
-                moveDown.Contains(mousePos);
+                moveDown.Contains(mousePos) || 
+                expand.Contains(mousePos);
 
             public bool MouseOverRow(Vector2 mousePos) =>
                 !MouseOverButton(mousePos) && row.Contains(mousePos);
@@ -69,7 +89,7 @@ namespace Haztech.SpriteEditor.Editor
             if (layerObj == null) return;
 
             bool selected = config.selectedLayer == index;
-            RowRects rects = new RowRects(EditorGUILayout.GetControlRect(false, EditorGUIUtility.singleLineHeight));
+            RowRects rects = new RowRects(EditorGUILayout.GetControlRect(false, EditorGUIUtility.singleLineHeight), layerObj is LayerGroup);
             bool grouping = false;
 
             HandleMouse(index, rects, layerObj, ref grouping);
@@ -189,6 +209,17 @@ namespace Haztech.SpriteEditor.Editor
 
                 EditorUtility.SetDirty(config);
                 toolWindow.Repaint();
+            }
+
+            if (layerObj is LayerGroup group)
+            {
+                bool expand = group.expanded;
+                expand = EditorGUI.Foldout(
+                    rects.expand,
+                    group.expanded,
+                    GUIContent.none);
+
+                group.Expand(expand);
             }
 
             if (layerObj != null && index > 0 &&
