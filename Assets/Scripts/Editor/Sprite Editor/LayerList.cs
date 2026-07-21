@@ -1,5 +1,4 @@
 using Haztech.SpriteEditor.Data;
-using Haztech.SpriteEditor.Editor;
 using UnityEditor;
 using UnityEngine;
 
@@ -9,13 +8,24 @@ namespace Haztech.SpriteEditor.Editor
     {
         [SerializeField] private static Vector2 scroll;
 
-        public static void Draw(ToolWindow window, float height)
+        public static void Draw(float height)
         {
-            SpriteConfig config = window.SpriteConfig;
+            SpriteConfig config = ToolWindow.Instance.SpriteConfig;
 
             EditorGUILayout.BeginVertical(EditorStyles.helpBox, GUILayout.Height(height));
             GUILayout.Label("Layers", EditorStyles.boldLabel);
 
+            DrawList(config);
+
+            EditorGUILayout.Space();
+
+            DrawButtons(config);
+
+            GUILayout.EndVertical();
+        }
+
+        private static void DrawList(SpriteConfig config)
+        {
             Rect listRect = EditorGUILayout.BeginVertical();
             EditorGUI.DrawRect(listRect, new Color(0.2f, 0.2f, 0.2f));
 
@@ -25,15 +35,16 @@ namespace Haztech.SpriteEditor.Editor
             {
                 for (int i = 0; i < config.ExpandedLayers.Count; i++)
                 {
-                    LayerRow.Draw(window, i);
+                    LayerRow.Draw(i);
                 }
                 GUI.backgroundColor = Color.white;
             }
             EditorGUILayout.EndScrollView();
             EditorGUILayout.EndVertical();
+        }
 
-            EditorGUILayout.Space();
-
+        private static void DrawButtons(SpriteConfig config)
+        {
             EditorGUILayout.BeginHorizontal();
 
             if (GUILayout.Button("New Layer") && config != null)
@@ -64,7 +75,6 @@ namespace Haztech.SpriteEditor.Editor
             }
 
             EditorGUILayout.EndHorizontal();
-            GUILayout.EndVertical();
         }
     }
 }

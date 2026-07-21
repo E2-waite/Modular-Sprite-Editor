@@ -6,30 +6,30 @@ namespace Haztech.SpriteEditor.Editor
 {
     public static class PropertiesPanel
     {
-        public static void Draw(ToolWindow window)
+        public static void Draw()
         {
             EditorGUILayout.BeginVertical(GUILayout.Width(260));
             float spacing = EditorGUIUtility.standardVerticalSpacing;
-            float availableHeight = window.position.height - 25f;
+            float availableHeight = ToolWindow.Instance.position.height - 25f;
             float sectionHeight = (availableHeight - spacing) * 0.5f;
-            DrawLayerProperties(window, sectionHeight);
-            DrawStateProperties(window, sectionHeight);
+            DrawLayerProperties(sectionHeight);
+            DrawStateProperties(sectionHeight);
 
             EditorGUILayout.EndVertical();
         }
 
 
-        private static void DrawLayerProperties(ToolWindow window, float height)
+        private static void DrawLayerProperties(float height)
         {
             EditorGUILayout.BeginVertical(EditorStyles.helpBox, GUILayout.Height(height));
             GUILayout.Label("Layer " +
                 "Properties", EditorStyles.boldLabel);
 
-            SpriteConfig config = window.SpriteConfig;
+            SpriteConfig config = ToolWindow.Instance.SpriteConfig;
 
-            if (config != null && window.SpriteConfig.selectedLayer >= 0 && window.SpriteConfig.selectedLayer < config.ExpandedLayers.Count)
+            if (config != null && ToolWindow.Instance.SpriteConfig.selectedLayer >= 0 && ToolWindow.Instance.SpriteConfig.selectedLayer < config.ExpandedLayers.Count)
             {
-                LayerObject layerObj = config.ExpandedLayers[window.SpriteConfig.selectedLayer];
+                LayerObject layerObj = config.ExpandedLayers[ToolWindow.Instance.SpriteConfig.selectedLayer];
 
                 if (layerObj is Layer layer)
                 {
@@ -38,7 +38,7 @@ namespace Haztech.SpriteEditor.Editor
                     layer.visible = EditorGUILayout.Toggle("Visible", layer.visible);
                     layer.name = EditorGUILayout.TextField("Name", layer.name);
 
-                    DrawColor(window);
+                    DrawColor();
 
                     ColorGroup colorGroup = null;
 
@@ -51,10 +51,10 @@ namespace Haztech.SpriteEditor.Editor
                         colorGroup.color = EditorGUILayout.ColorField("Group Color", colorGroup.color);
 
 
-                    StateData state = layer.GetState(window.SpriteConfig.selectedState);
+                    StateData state = layer.GetState(ToolWindow.Instance.SpriteConfig.selectedState);
                     if (state != null)
                     {
-                        SpriteData data = state.GetData(window.SpriteConfig.selectedDir);
+                        SpriteData data = state.GetData(ToolWindow.Instance.SpriteConfig.selectedDir);
                         data.sprite = (Sprite)EditorGUILayout.ObjectField("Sprite", data.sprite, typeof(Sprite), false);
                     }
                 }
@@ -72,17 +72,15 @@ namespace Haztech.SpriteEditor.Editor
         }
 
 
-        private static void DrawColor(ToolWindow window)
+        private static void DrawColor()
         {
             EditorGUILayout.BeginHorizontal();
 
-            SpriteConfig config = window.SpriteConfig;
+            SpriteConfig config = ToolWindow.Instance.SpriteConfig;
 
             if (config != null)
             {
-                LayerObject layerObj = config.ExpandedLayers[window.SpriteConfig.selectedLayer];
-
-
+                LayerObject layerObj = config.ExpandedLayers[ToolWindow.Instance.SpriteConfig.selectedLayer];
 
                 if (layerObj != null && layerObj is Layer layer)
                 {
@@ -107,19 +105,19 @@ namespace Haztech.SpriteEditor.Editor
             }
             EditorGUILayout.EndHorizontal();
         }
-        private static void DrawStateProperties(ToolWindow window, float height)
+        private static void DrawStateProperties(float height)
         {
             EditorGUILayout.BeginVertical(EditorStyles.helpBox, GUILayout.Height(height));
             GUILayout.Label("State " +
                 "Properties", EditorStyles.boldLabel);
 
-            SpriteConfig config = window.SpriteConfig;
+            SpriteConfig config = ToolWindow.Instance.SpriteConfig;
 
-            if (config != null && window.SpriteConfig.selectedLayer >= 0 && window.SpriteConfig.selectedLayer < config.LayerCount)
+            if (config != null && ToolWindow.Instance.SpriteConfig.selectedLayer >= 0 && ToolWindow.Instance.SpriteConfig.selectedLayer < config.LayerCount)
             {
                 Undo.RecordObject(config, "Edit Sprite State");
 
-                StateConfig state = config.GetStateConfig(window.SpriteConfig.selectedState);
+                StateConfig state = config.GetStateConfig(ToolWindow.Instance.SpriteConfig.selectedState);
 
                 if (state != null)
                 {
@@ -130,7 +128,5 @@ namespace Haztech.SpriteEditor.Editor
             }
             EditorGUILayout.EndVertical();
         }
-
-
     }
 }

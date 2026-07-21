@@ -1,40 +1,21 @@
 using Haztech.SpriteEditor.Data;
 using UnityEditor;
 using UnityEngine;
+
 namespace Haztech.SpriteEditor.Editor
 {
     public static class DirectionSelector
     {
-        public static float Draw(ToolWindow window)
+        public static float Draw()
         {
             Rect sectionRect = EditorGUILayout.BeginVertical(EditorStyles.helpBox);
             GUILayout.Label("Directions", EditorStyles.boldLabel);
 
             EditorGUILayout.BeginVertical();
 
-            EditorGUILayout.BeginHorizontal();
-            GUILayout.FlexibleSpace();
-            DrawDirButton(window, "↖", Direction.NorthWest);
-            DrawDirButton(window, "↑", Direction.North);
-            DrawDirButton(window, "↗", Direction.NorthEast);
-            GUILayout.FlexibleSpace();
-            EditorGUILayout.EndHorizontal();
-
-            EditorGUILayout.BeginHorizontal();
-            GUILayout.FlexibleSpace();
-            DrawDirButton(window, "←", Direction.West);
-            DrawDirButton(window, "", Direction.Null);
-            DrawDirButton(window, "→", Direction.East);
-            GUILayout.FlexibleSpace();
-            EditorGUILayout.EndHorizontal();
-
-            EditorGUILayout.BeginHorizontal();
-            GUILayout.FlexibleSpace();
-            DrawDirButton(window, "↙", Direction.SouthWest);
-            DrawDirButton(window, "↓", Direction.South);
-            DrawDirButton(window, "↘", Direction.SouthEast);
-            GUILayout.FlexibleSpace();
-            EditorGUILayout.EndHorizontal();
+            DrawDirRow(("↖", Direction.NorthWest),  ("↑", Direction.North), ("↗", Direction.NorthEast));
+            DrawDirRow(("←", Direction.West),       ("", Direction.Null),   ("→", Direction.East));
+            DrawDirRow(("↙", Direction.SouthWest),  ("↓", Direction.South), ("↘", Direction.SouthEast));
 
             EditorGUILayout.EndVertical();
 
@@ -43,7 +24,19 @@ namespace Haztech.SpriteEditor.Editor
             return sectionRect.height;
         }
 
-        private static void DrawDirButton(ToolWindow window, string icon, Direction dir)
+        private static void DrawDirRow(params (string icon, Direction dir)[] points)
+        {
+            EditorGUILayout.BeginHorizontal();
+            GUILayout.FlexibleSpace();
+            foreach (var point in points)
+            {
+                DrawDirButton(point.icon, point.dir);
+            }
+            GUILayout.FlexibleSpace();
+            EditorGUILayout.EndHorizontal();
+        }
+
+        private static void DrawDirButton(string icon, Direction dir)
         {
             if (dir == Direction.Null)
             {
@@ -53,7 +46,7 @@ namespace Haztech.SpriteEditor.Editor
             {
                 Color old = GUI.backgroundColor;
 
-                SpriteConfig config = window.SpriteConfig;
+                SpriteConfig config = ToolWindow.Instance.SpriteConfig;
 
                 if (config.selectedDir == dir)
                 {

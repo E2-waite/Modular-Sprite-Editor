@@ -1,10 +1,9 @@
 using Haztech.SpriteEditor.Data;
 using UnityEditor;
 using UnityEngine;
+
 namespace Haztech.SpriteEditor.Editor
 {
-
-
     public static class LayerRow
     {
         const float buttonSize = 18f;
@@ -21,59 +20,110 @@ namespace Haztech.SpriteEditor.Editor
             {
                 this.row = row;
 
-                Rect eyeRect = new Rect(
+                visibility = new Rect(
                      row.x + padding,
                      row.y,
                      buttonSize,
                      row.height);
 
-                Rect downRect = new Rect(
+                moveDown = new Rect(
                     row.xMax - buttonSize - padding,
                     row.y,
                     buttonSize,
                     row.height);
 
-                Rect upRect = new Rect(
-                    downRect.x - buttonSize - padding,
+                moveUp = new Rect(
+                    moveDown.x - buttonSize - padding,
                     row.y,
                     buttonSize,
                     row.height);
 
-                Rect labelRect = new Rect(
-                    eyeRect.xMax + 4f,
+                label = new Rect(
+                    visibility.xMax + 4f,
                     row.y,
-                    row.width - eyeRect.xMax - 8f,
+                    row.width - visibility.xMax - 8f,
                     row.height);
             }
 
-            public bool MouseOverButton =>
-                visibility.Contains(Event.current.mousePosition) ||
-                moveUp.Contains(Event.current.mousePosition) ||
-                moveDown.Contains(Event.current.mousePosition);
-            
+            public bool MouseOverButton(Vector2 mousePos) =>
+                visibility.Contains(mousePos) ||
+                moveUp.Contains(mousePos) ||
+                moveDown.Contains(mousePos);
+
+            public bool MouseOverRow(Vector2 mousePos) =>
+                !MouseOverButton(mousePos) && row.Contains(mousePos);
+
         }
 
         private static int draggedId = -1;
-        public static void Draw(ToolWindow window, int index)
+        private static ToolWindow toolWindow;
+        private static SpriteConfig config;
+
+        public static void Draw(int index)
         {
-            SpriteConfig config = window.SpriteConfig;
+            if (ToolWindow.Instance == null) return;
+            toolWindow = ToolWindow.Instance;
+            config = ToolWindow.Instance.SpriteConfig;
             if (config == null) return;
             LayerObject layerObj = config.ExpandedLayers[index];
             if (layerObj == null) return;
 
             bool selected = config.selectedLayer == index;
             RowRects rects = new RowRects(EditorGUILayout.GetControlRect(false, EditorGUIUtility.singleLineHeight));
+            bool grouping = false;
 
-            if (!rects.MouseOverButton && Event.current.type == EventType.MouseDown &&
-                rects.row.Contains(Event.current.mousePosition))
+            HandleMouse(index, rects, layerObj, ref grouping);
+
+            // Draw row rect
+            if (grouping)
+            {
+                EditorGUI.DrawRect(
+                    rects.row,
+                    new Color(0.24f, 0.48f, 1f));
+            }
+            else if (selected)
+            {
+                EditorGUI.DrawRect(
+                    rects.row,
+                    new Color(0.24f, 0.48f, 0.85f));
+            }
+            else if (rects.row.Contains(Event.current.mousePosition))
+            {
+                EditorGUI.DrawRect(
+                    rects.row,
+                    new Color(1f, 1f, 1f, 0.08f));
+            }
+
+            DrawButtons(index, rects, layerObj);
+
+            // Draw label
+            Layer layer = null;
+            if (layerObj is Layer) layer = (Layer)layerObj;
+
+            string label = layerObj.name;
+            if (layer != null && layer.InGroup)
+            {
+                label = "   " + label;
+            }
+
+            GUI.Label(
+                new Rect(
+                    rects.label.x + 4f,
+                    rects.label.y,
+                    rects.label.width - 8f,
+                    rects.label.height),
+                    label);
+        }
+
+        private static void HandleMouse(int index, RowRects rects, LayerObject layerObj, ref bool grouping)
+        {
+            if (Event.current.type == EventType.MouseDown && rects.MouseOverRow(Event.current.mousePosition))
             {
                 config.selectedLayer = index;
                 draggedId = index;
                 Event.current.Use();
-                window.Repaint();
+                toolWindow.Repaint();
             }
-
-            bool grouping = false;
 
             if (draggedId >= 0 && Event.current.type == EventType.MouseDrag)
             {
@@ -93,7 +143,7 @@ namespace Haztech.SpriteEditor.Editor
                         grouping = true;
                     }
 
-                    window.Repaint();
+                    toolWindow.Repaint();
 
                     Event.current.Use();
                 }
@@ -120,29 +170,12 @@ namespace Haztech.SpriteEditor.Editor
 
                 draggedId = -1;
                 Event.current.Use();
-                window.Repaint();
+                toolWindow.Repaint();
             }
+        }
 
-            // Draw layer rect
-            if (grouping)
-            {
-                EditorGUI.DrawRect(
-                    rects.row,
-                    new Color(0.24f, 0.48f, 1f));
-            }
-            else if (selected)
-            {
-                EditorGUI.DrawRect(
-                    rects.row,
-                    new Color(0.24f, 0.48f, 0.85f));
-            }
-            else if (rects.row.Contains(Event.current.mousePosition))
-            {
-                EditorGUI.DrawRect(
-                    rects.row,
-                    new Color(1f, 1f, 1f, 0.08f));
-            }
-
+        private static void DrawButtons(int index, RowRects rects, LayerObject layerObj)
+        {
             GUIContent eyeIcon = EditorGUIUtility.IconContent(
                                     layerObj.visible
                                         ? "animationvisibilitytoggleon"
@@ -155,46 +188,26 @@ namespace Haztech.SpriteEditor.Editor
                 layerObj.visible = !layerObj.visible;
 
                 EditorUtility.SetDirty(config);
-                window.Repaint();
+                toolWindow.Repaint();
             }
 
-            Layer layer = null;
-            if (layerObj is Layer) layer = (Layer)layerObj;
-
-
-
-            if (layerObj != null && index > 0 && 
+            if (layerObj != null && index > 0 &&
                 GUI.Button(rects.moveUp, EditorGUIUtility.IconContent("scrollup"), EditorStyles.iconButton))
             {
-                window.SpriteConfig.MoveLayerUp(index);
-                window.SpriteConfig.selectedLayer--;
-                EditorUtility.SetDirty(window.SpriteConfig);
-                window.Repaint();
+                config.MoveLayerUp(index);
+                config.selectedLayer--;
+                EditorUtility.SetDirty(config);
+                toolWindow.Repaint();
             }
 
-            if (layerObj != null && index < config.ExpandedLayers.Count -1 && 
+            if (layerObj != null && index < config.ExpandedLayers.Count - 1 &&
                 GUI.Button(rects.moveDown, EditorGUIUtility.IconContent("scrolldown"), EditorStyles.iconButton))
             {
-                window.SpriteConfig.MoveLayerDown(index);
-                window.SpriteConfig.selectedLayer++;
-                EditorUtility.SetDirty(window.SpriteConfig);
-                window.Repaint();
+                config.MoveLayerDown(index);
+                config.selectedLayer++;
+                EditorUtility.SetDirty(config);
+                toolWindow.Repaint();
             }
-
-            string label = layerObj.name;
-
-            if (layer != null && layer.InGroup)
-            {
-                label = "   " + label;
-            }
-
-            GUI.Label(
-                new Rect(
-                    rects.label.x + 4f,
-                    rects.label.y,
-                    rects.label.width - 8f,
-                    rects.label.height),
-                    label);
         }
     }
 }

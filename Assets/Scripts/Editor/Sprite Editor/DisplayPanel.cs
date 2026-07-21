@@ -6,7 +6,7 @@ namespace Haztech.SpriteEditor.Editor
 {
     public static class DisplayPanel
     {
-        public static void Draw(ToolWindow window)
+        public static void Draw()
         {
             EditorGUILayout.BeginVertical(EditorStyles.helpBox);
             GUILayout.Label("Preview", EditorStyles.boldLabel);
@@ -19,27 +19,27 @@ namespace Haztech.SpriteEditor.Editor
             previewRect,
             new Color(0.15f, 0.15f, 0.15f));
 
-            Vector2 canvasSize = GetCanvasSize(window);
+            Vector2 canvasSize = GetCanvasSize();
 
-            DrawLayers(window, previewRect, canvasSize);
+            DrawLayers(previewRect, canvasSize);
             EditorGUILayout.EndHorizontal();
 
 
             //EditorGUILayout.BeginVertical(EditorStyles.helpBox, GUILayout.Height(200));
             //GUILayout.Label("Details", EditorStyles.boldLabel);
 
-            //DrawDetails(window);
+            //DrawDetails(ToolWindow.Instance);
 
             //EditorGUILayout.EndVertical();
 
             EditorGUILayout.EndVertical();
         }
          
-        private static Vector2 GetCanvasSize(ToolWindow window)
+        private static Vector2 GetCanvasSize()
         {
             Vector2 size = Vector2.zero;
 
-            SpriteConfig config = window.SpriteConfig;
+            SpriteConfig config = ToolWindow.Instance.SpriteConfig;
 
             if (config != null)
             {
@@ -48,10 +48,10 @@ namespace Haztech.SpriteEditor.Editor
                     Layer layer = config.GetLayer(i);
                     if (layer == null) continue;
 
-                    StateData state = layer.GetState(window.SpriteConfig.selectedState);
+                    StateData state = layer.GetState(ToolWindow.Instance.SpriteConfig.selectedState);
                     if (state == null) continue;
 
-                    SpriteData data = state.GetData(window.SpriteConfig.selectedDir);
+                    SpriteData data = state.GetData(ToolWindow.Instance.SpriteConfig.selectedDir);
                     if (data == null || data.sprite == null) continue;
 
                     size.x = Mathf.Max(size.x, data.sprite.rect.width);
@@ -62,7 +62,7 @@ namespace Haztech.SpriteEditor.Editor
             return size;
         }
 
-        private static void DrawLayers(ToolWindow window, Rect previewRect, Vector2 canvasSize)
+        private static void DrawLayers(Rect previewRect, Vector2 canvasSize)
         {
             float scale = Mathf.Min(
             previewRect.width / canvasSize.x,
@@ -76,7 +76,7 @@ namespace Haztech.SpriteEditor.Editor
                    displayedCanvasSize.x,
                    displayedCanvasSize.y);
 
-            SpriteConfig config = window.SpriteConfig;
+            SpriteConfig config = ToolWindow.Instance.SpriteConfig;
 
             if (config != null)
             {
@@ -89,10 +89,10 @@ namespace Haztech.SpriteEditor.Editor
                     Layer layer = (Layer)layerObj;
                     if (layer == null || !layer.visible) continue;
 
-                    StateData state = layer.GetState(window.SpriteConfig.selectedState);
+                    StateData state = layer.GetState(ToolWindow.Instance.SpriteConfig.selectedState);
                     if (state == null) continue;
 
-                    SpriteData data = state.GetData(window.SpriteConfig.selectedDir);
+                    SpriteData data = state.GetData(ToolWindow.Instance.SpriteConfig.selectedDir);
                     if (data == null || data.sprite == null) continue;
 
                     ColorGroup colorGroup = null;
@@ -135,9 +135,9 @@ namespace Haztech.SpriteEditor.Editor
             GUI.color = previousColor;
         }
 
-        static void DrawDetails(ToolWindow window)
+        static void DrawDetails()
         {
-            window.SpriteConfig.selectedDir = (Direction)EditorGUILayout.EnumPopup("Direction Mode", window.SpriteConfig.selectedDir);
+            ToolWindow.Instance.SpriteConfig.selectedDir = (Direction)EditorGUILayout.EnumPopup("Direction Mode", ToolWindow.Instance.SpriteConfig.selectedDir);
         }
     }
 }

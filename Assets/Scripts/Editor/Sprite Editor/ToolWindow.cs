@@ -1,7 +1,8 @@
+using Haztech.SpriteEditor.Data;
 using UnityEditor;
 using UnityEditor.Callbacks;
+using UnityEditor.PackageManager.UI;
 using UnityEngine;
-using Haztech.SpriteEditor.Data;
 
 namespace Haztech.SpriteEditor.Editor
 {
@@ -12,6 +13,7 @@ namespace Haztech.SpriteEditor.Editor
 
         public SpriteConfig SpriteConfig => config;
 
+        public static ToolWindow Instance;
 
         [OnOpenAsset]
         public static bool OnOpenAsset(EntityId entityId, int line)
@@ -24,11 +26,11 @@ namespace Haztech.SpriteEditor.Editor
             if (openedConfig == null)
                 return false;
 
-            ToolWindow window = GetWindow<ToolWindow>("Sprite Editor");
+            Instance = GetWindow<ToolWindow>("Sprite Editor");
 
-            window.OpenConfig(path);
-            window.Show();
-            window.Focus();
+            Instance.OpenConfig(path);
+            Instance.Show();
+            Instance.Focus();
 
             return true;
         }
@@ -45,7 +47,7 @@ namespace Haztech.SpriteEditor.Editor
         [MenuItem("Tools/Sprite Editor")]
         public static void ShowWindow()
         {
-            GetWindow<ToolWindow>("Sprite Editor");
+            Instance = GetWindow<ToolWindow>("Sprite Editor");
         }
 
         void OnGUI()
@@ -56,9 +58,9 @@ namespace Haztech.SpriteEditor.Editor
 
             EditorGUILayout.BeginHorizontal();
 
-            SelectPanel.Draw(this);
-            DisplayPanel.Draw(this);
-            PropertiesPanel.Draw(this);
+            SelectPanel.Draw();
+            DisplayPanel.Draw();
+            PropertiesPanel.Draw();
             EditorGUILayout.EndHorizontal();
 
             if (config != null)
