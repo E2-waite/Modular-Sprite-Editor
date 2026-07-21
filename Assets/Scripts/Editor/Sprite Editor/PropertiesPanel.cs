@@ -22,8 +22,7 @@ namespace Haztech.SpriteEditor.Editor
         private static void DrawLayerProperties(float height)
         {
             EditorGUILayout.BeginVertical(EditorStyles.helpBox, GUILayout.Height(height));
-            GUILayout.Label("Layer " +
-                "Properties", EditorStyles.boldLabel);
+            GUILayout.Label("Layer Properties", EditorStyles.boldLabel);
 
             SpriteConfig config = Window.Instance.SpriteConfig;
 

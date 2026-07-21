@@ -22,8 +22,29 @@ namespace Haztech.SpriteEditor.Data
         //public IEnumerable<Layer> Layers => layers;
         public List<LayerObject> ExpandedLayers => expanded;
         public int StateCount => states.Count;
-        public IEnumerable<StateConfig> States => states;
+        public List<StateConfig> States => states;
         public List<ColorGroup> ColorGroups => colorGroups;
+        public List<Layer> GetLayers()
+        {
+            List<Layer> layers = new List<Layer>();
+            foreach (LayerObject layerObj in layerObjects)
+            {
+                if (layerObj == null) continue;
+
+                if (layerObj is Layer layer)
+                {
+                    layers.Add(layer);
+                }
+                else if (layerObj is LayerGroup group)
+                {
+                    foreach (Layer groupedLayer in group.Layers)
+                    {
+                        layers.Add(groupedLayer);
+                    }
+                }
+            }
+            return layers;
+        }
 
         public Sprite GetSprite(int layerId, Direction dir = Direction.Null)
         {

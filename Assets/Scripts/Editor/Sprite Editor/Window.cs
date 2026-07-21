@@ -1,7 +1,6 @@
 using Haztech.SpriteEditor.Data;
 using UnityEditor;
 using UnityEditor.Callbacks;
-using UnityEditor.PackageManager.UI;
 using UnityEngine;
 
 namespace Haztech.SpriteEditor.Editor

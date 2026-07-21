@@ -27,9 +27,14 @@ namespace Haztech.SpriteEditor.Editor
             GenericMenu menu = new GenericMenu();
 
             menu.AddItem(
-                new GUIContent("Settings"),
+                new GUIContent("Settings..."),
                 false,
                 () => Settings());
+
+            menu.AddItem(
+                new GUIContent("Import Sprite Sheet..."),
+                false,
+                () => ImportSheet());
 
             menu.DropDown(buttonRect);
         }
@@ -37,6 +42,11 @@ namespace Haztech.SpriteEditor.Editor
         private static void Settings()
         {
 
+        }
+
+        private static void ImportSheet()
+        {
+            ImportWindow.Open();
         }
     }
 }
