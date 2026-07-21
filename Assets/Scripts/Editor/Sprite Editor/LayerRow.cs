@@ -3,8 +3,56 @@ using UnityEditor;
 using UnityEngine;
 namespace Haztech.SpriteEditor.Editor
 {
+
+
     public static class LayerRow
     {
+        const float buttonSize = 18f;
+
+        private class RowRects
+        {
+            private const float padding = 2f;
+            public Rect row;
+            public Rect visibility;
+            public Rect moveDown;
+            public Rect moveUp;
+            public Rect label;
+            public RowRects(Rect row)
+            {
+                this.row = row;
+
+                Rect eyeRect = new Rect(
+                     row.x + padding,
+                     row.y,
+                     buttonSize,
+                     row.height);
+
+                Rect downRect = new Rect(
+                    row.xMax - buttonSize - padding,
+                    row.y,
+                    buttonSize,
+                    row.height);
+
+                Rect upRect = new Rect(
+                    downRect.x - buttonSize - padding,
+                    row.y,
+                    buttonSize,
+                    row.height);
+
+                Rect labelRect = new Rect(
+                    eyeRect.xMax + 4f,
+                    row.y,
+                    row.width - eyeRect.xMax - 8f,
+                    row.height);
+            }
+
+            public bool MouseOverButton =>
+                visibility.Contains(Event.current.mousePosition) ||
+                moveUp.Contains(Event.current.mousePosition) ||
+                moveDown.Contains(Event.current.mousePosition);
+            
+        }
+
         private static int draggedId = -1;
         public static void Draw(ToolWindow window, int index)
         {
@@ -13,42 +61,11 @@ namespace Haztech.SpriteEditor.Editor
             LayerObject layerObj = config.ExpandedLayers[index];
             if (layerObj == null) return;
 
-            const float padding = 2f;
-            const float buttonSize = 18f;
-            Rect rowRect = EditorGUILayout.GetControlRect(false, EditorGUIUtility.singleLineHeight);
             bool selected = config.selectedLayer == index;
+            RowRects rects = new RowRects(EditorGUILayout.GetControlRect(false, EditorGUIUtility.singleLineHeight));
 
-            Rect eyeRect = new Rect(
-                rowRect.x + padding,
-                rowRect.y,
-                buttonSize,
-                rowRect.height);
-
-            Rect downRect = new Rect(
-                rowRect.xMax - buttonSize - padding,
-                rowRect.y,
-                buttonSize,
-                rowRect.height);
-
-            Rect upRect = new Rect(
-                downRect.x - buttonSize - padding,
-                rowRect.y,
-                buttonSize,
-                rowRect.height);
-
-            Rect labelRect = new Rect(
-                eyeRect.xMax + 4f,
-                rowRect.y,
-                rowRect.width - eyeRect.xMax - 8f,
-                rowRect.height);
-
-            bool mouseOverButton =
-                eyeRect.Contains(Event.current.mousePosition) ||
-                upRect.Contains(Event.current.mousePosition) ||
-                downRect.Contains(Event.current.mousePosition);
-
-            if (!mouseOverButton && Event.current.type == EventType.MouseDown &&
-                rowRect.Contains(Event.current.mousePosition))
+            if (!rects.MouseOverButton && Event.current.type == EventType.MouseDown &&
+                rects.row.Contains(Event.current.mousePosition))
             {
                 config.selectedLayer = index;
                 draggedId = index;
@@ -60,7 +77,7 @@ namespace Haztech.SpriteEditor.Editor
 
             if (draggedId >= 0 && Event.current.type == EventType.MouseDrag)
             {
-                if (index != draggedId && rowRect.Contains(Event.current.mousePosition))
+                if (index != draggedId && rects.row.Contains(Event.current.mousePosition))
                 {
                     if (layerObj is Layer)
                     {
@@ -87,7 +104,7 @@ namespace Haztech.SpriteEditor.Editor
 
             if (draggedId >= 0 &&
                 Event.current.type == EventType.MouseUp &&
-                rowRect.Contains(Event.current.mousePosition))
+                rects.row.Contains(Event.current.mousePosition))
             {
                 if (index != draggedId)
                 {
@@ -110,19 +127,19 @@ namespace Haztech.SpriteEditor.Editor
             if (grouping)
             {
                 EditorGUI.DrawRect(
-                    rowRect,
+                    rects.row,
                     new Color(0.24f, 0.48f, 1f));
             }
             else if (selected)
             {
                 EditorGUI.DrawRect(
-                    rowRect,
+                    rects.row,
                     new Color(0.24f, 0.48f, 0.85f));
             }
-            else if (rowRect.Contains(Event.current.mousePosition))
+            else if (rects.row.Contains(Event.current.mousePosition))
             {
                 EditorGUI.DrawRect(
-                    rowRect,
+                    rects.row,
                     new Color(1f, 1f, 1f, 0.08f));
             }
 
@@ -131,7 +148,7 @@ namespace Haztech.SpriteEditor.Editor
                                         ? "animationvisibilitytoggleon"
                                         : "animationvisibilitytoggleoff");
 
-            if (GUI.Button(eyeRect, eyeIcon, EditorStyles.iconButton))
+            if (GUI.Button(rects.visibility, eyeIcon, EditorStyles.iconButton))
             {
                 Undo.RecordObject(config, "Toggle Layer Visibility");
 
@@ -147,7 +164,7 @@ namespace Haztech.SpriteEditor.Editor
 
 
             if (layerObj != null && index > 0 && 
-                GUI.Button(upRect, EditorGUIUtility.IconContent("scrollup"), EditorStyles.iconButton))
+                GUI.Button(rects.moveUp, EditorGUIUtility.IconContent("scrollup"), EditorStyles.iconButton))
             {
                 window.SpriteConfig.MoveLayerUp(index);
                 window.SpriteConfig.selectedLayer--;
@@ -156,7 +173,7 @@ namespace Haztech.SpriteEditor.Editor
             }
 
             if (layerObj != null && index < config.ExpandedLayers.Count -1 && 
-                GUI.Button(downRect, EditorGUIUtility.IconContent("scrolldown"), EditorStyles.iconButton))
+                GUI.Button(rects.moveDown, EditorGUIUtility.IconContent("scrolldown"), EditorStyles.iconButton))
             {
                 window.SpriteConfig.MoveLayerDown(index);
                 window.SpriteConfig.selectedLayer++;
@@ -173,10 +190,10 @@ namespace Haztech.SpriteEditor.Editor
 
             GUI.Label(
                 new Rect(
-                    labelRect.x + 4f,
-                    labelRect.y,
-                    labelRect.width - 8f,
-                    labelRect.height),
+                    rects.label.x + 4f,
+                    rects.label.y,
+                    rects.label.width - 8f,
+                    rects.label.height),
                     label);
         }
     }
