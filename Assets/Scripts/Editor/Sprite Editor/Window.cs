@@ -12,7 +12,7 @@ namespace Haztech.SpriteEditor.Editor
 
         public SpriteConfig SpriteConfig => config;
 
-        public static Window Instance;
+        [SerializeField] public static Window Instance;
 
         [OnOpenAsset]
         public static bool OnOpenAsset(EntityId entityId, int line)

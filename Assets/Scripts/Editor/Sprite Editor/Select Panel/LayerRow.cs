@@ -24,6 +24,13 @@ namespace Haztech.SpriteEditor.Editor
 
                 float currentX = row.x + padding;
 
+                visibility = new Rect(
+                    currentX,
+                    row.y,
+                    buttonSize,
+                    row.height);
+                currentX = visibility.xMax + padding;
+
                 if (isGroup)
                 {
                     expand = new Rect(
@@ -39,12 +46,6 @@ namespace Haztech.SpriteEditor.Editor
                     expand = Rect.zero;
                 }
 
-                visibility = new Rect(
-                    currentX,
-                    row.y,
-                    buttonSize,
-                    row.height);
-
                 moveDown = new Rect(
                     row.xMax - buttonSize - padding,
                     row.y,
@@ -58,9 +59,9 @@ namespace Haztech.SpriteEditor.Editor
                     row.height);
 
                 label = new Rect(
-                    visibility.xMax + 4f,
+                    (isGroup ? expand.xMax : visibility.xMax),
                     row.y,
-                    moveUp.x - visibility.xMax - 8f,
+                    moveUp.x - (isGroup ? expand.xMax : 0) - visibility.xMax - 8f,
                     row.height);
             }
 
@@ -90,9 +91,12 @@ namespace Haztech.SpriteEditor.Editor
 
             bool selected = config.selectedLayer == index;
             RowRects rects = new RowRects(EditorGUILayout.GetControlRect(false, EditorGUIUtility.singleLineHeight), layerObj is LayerGroup);
+
             bool grouping = false;
 
             HandleMouse(index, rects, layerObj, ref grouping);
+
+            bool isGroup = layerObj is LayerGroup;
 
             // Draw row rect
             if (grouping)
@@ -107,12 +111,18 @@ namespace Haztech.SpriteEditor.Editor
                     rects.row,
                     new Color(0.24f, 0.48f, 0.85f));
             }
-            else if (rects.row.Contains(Event.current.mousePosition))
+            else if (isGroup)
             {
                 EditorGUI.DrawRect(
                     rects.row,
-                    new Color(1f, 1f, 1f, 0.08f));
+                    new Color(1f, 1f, 1f, .05f));
             }
+            //else
+            //{
+            //    EditorGUI.DrawRect(
+            //        rects.row,
+            //        new Color(.75f, .75f, .75f, .008f));
+            //}
 
             DrawButtons(index, rects, layerObj);
 
@@ -123,7 +133,7 @@ namespace Haztech.SpriteEditor.Editor
             string label = layerObj.name;
             if (layer != null && layer.InGroup)
             {
-                label = "   " + label;
+                label = "| " + label;
             }
 
             GUI.Label(

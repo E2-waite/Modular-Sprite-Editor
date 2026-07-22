@@ -10,8 +10,9 @@ namespace Haztech.SpriteEditor.Data
         public Color color = Color.white;
         public int colorGroupId = -1;
         public List<StateData> states = new List<StateData>();
-        [SerializeField] private LayerGroup group = null;
+        private LayerGroup group = null;
         public bool InGroup => group != null;
+        public LayerGroup Group => group;
         public Layer(string name, SpriteConfig config)
         {
             this.name = name;
@@ -20,18 +21,12 @@ namespace Haztech.SpriteEditor.Data
 
         public void SetGroup(LayerGroup newGroup)
         {
-            ClearGroup();
             group = newGroup;
-            group.AddLayer(this);
         }
 
         public void ClearGroup()
         {
-            if (group != null)
-            {
-                group.RemoveLayer(this);
-                group = null;
-            }
+            group = null;
         }
 
         public StateData GetState(int index)

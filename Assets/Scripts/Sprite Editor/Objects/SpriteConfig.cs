@@ -1,7 +1,5 @@
 using System.Collections.Generic;
-using UnityEditor.PackageManager;
 using UnityEngine;
-using static UnityEditor.Experimental.GraphView.GraphView;
 
 namespace Haztech.SpriteEditor.Data
 {
@@ -10,7 +8,8 @@ namespace Haztech.SpriteEditor.Data
         [SerializeReference] private List<LayerObject> layerObjects = new List<LayerObject>();
         [SerializeField] private List<StateConfig> states = new List<StateConfig>();
         [SerializeField] private List<ColorGroup> colorGroups = new List<ColorGroup>();
-        [SerializeReference] private List<LayerObject> expanded = new List<LayerObject>();
+
+        private List<LayerObject> expanded = new List<LayerObject>();
 
 
 
@@ -24,6 +23,13 @@ namespace Haztech.SpriteEditor.Data
         public int StateCount => states.Count;
         public List<StateConfig> States => states;
         public List<ColorGroup> ColorGroups => colorGroups;
+
+        private void OnEnable()
+        {
+            RefreshGroupRef();
+            RefeshExpandedList();
+        }
+
         public List<Layer> GetLayers()
         {
             List<Layer> layers = new List<Layer>();
@@ -215,9 +221,17 @@ namespace Haztech.SpriteEditor.Data
         {
             if (layer == null || group == null) return;
 
-            layerObjects.Remove(layer);
+            // Clear existing storage
+            if (layer.InGroup)
+            {
+                layer.Group.RemoveLayer(layer);
+            }
+            else
+            {
+                layerObjects.Remove(layer);
+            }
 
-            layer.SetGroup(group);
+            group.AddLayer(layer);
 
             RefeshExpandedList();
         }
@@ -243,6 +257,24 @@ namespace Haztech.SpriteEditor.Data
                             expanded.Add(groupLayer);
                         }
                     }
+                }
+            }
+        }
+
+        private void RefreshGroupRef()
+        {
+            foreach (LayerObject layerObj in layerObjects)
+            {
+                if (layerObj is LayerGroup group)
+                {
+                    foreach (Layer layer in group.Layers)
+                    {
+                        layer.SetGroup(group);
+                    }
+                }
+                else if (layerObj is Layer layer)
+                {
+                    layer.ClearGroup();
                 }
             }
         }

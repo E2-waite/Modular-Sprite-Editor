@@ -19,13 +19,18 @@ namespace Haztech.SpriteEditor.Data
         public void AddLayer(Layer layer)
         {
             if (!layers.Contains(layer))
+            {
                 layers.Add(layer);
+                layer.SetGroup(this);
+            }
         }
 
         public void RemoveLayer(Layer layer)
         {
             if (layer != null && layers != null)
+            {
                 layers.Remove(layer);
+            }
         }
 
         public void RemoveLayer(int index)
