@@ -18,7 +18,7 @@ namespace Haztech.SpriteEditor.Editor
             public Rect label;
             public Rect expand;
 
-            public RowRects(Rect row, bool isGroup)
+            public RowRects(Rect row, bool isGroup, bool inGroup)
             {
                 this.row = row;
 
@@ -31,7 +31,7 @@ namespace Haztech.SpriteEditor.Editor
                     row.height);
                 currentX = visibility.xMax + padding;
 
-                if (isGroup)
+                if (isGroup || inGroup)
                 {
                     expand = new Rect(
                         currentX,
@@ -59,9 +59,9 @@ namespace Haztech.SpriteEditor.Editor
                     row.height);
 
                 label = new Rect(
-                    (isGroup ? expand.xMax : visibility.xMax),
+                    (isGroup || inGroup ? expand.xMax : visibility.xMax),
                     row.y,
-                    moveUp.x - (isGroup ? expand.xMax : 0) - visibility.xMax - 8f,
+                    moveUp.x - (isGroup || inGroup ? expand.xMax : 0) - visibility.xMax - 8f,
                     row.height);
             }
 
@@ -77,6 +77,7 @@ namespace Haztech.SpriteEditor.Editor
         }
 
         private static int draggedId = -1;
+        private static int groupId = -1;
         private static Window toolWindow;
         private static SpriteConfig config;
 
@@ -89,21 +90,30 @@ namespace Haztech.SpriteEditor.Editor
             LayerObject layerObj = config.ExpandedLayers[index];
             if (layerObj == null) return;
 
+            Layer layer = null;
+            LayerGroup group = null;
+
+            if (layerObj is Layer)
+                layer = (Layer)layerObj;
+            else if (layerObj is LayerGroup)
+                group = (LayerGroup)layerObj;
+
             bool selected = config.selectedLayer == index;
-            RowRects rects = new RowRects(EditorGUILayout.GetControlRect(false, EditorGUIUtility.singleLineHeight), layerObj is LayerGroup);
+            bool isGroup = group != null;
+            bool inGroup = layer != null && layer.InGroup;
+
+            RowRects rects = new RowRects(EditorGUILayout.GetControlRect(false, EditorGUIUtility.singleLineHeight), isGroup, inGroup);
 
             bool grouping = false;
 
             HandleMouse(index, rects, layerObj, ref grouping);
 
-            bool isGroup = layerObj is LayerGroup;
-
             // Draw row rect
-            if (grouping)
+            if (index == groupId)
             {
                 EditorGUI.DrawRect(
                     rects.row,
-                    new Color(0.24f, 0.48f, 1f));
+                    new Color(1f, 1f, 1f, 1f));
             }
             else if (selected)
             {
@@ -117,32 +127,18 @@ namespace Haztech.SpriteEditor.Editor
                     rects.row,
                     new Color(1f, 1f, 1f, .05f));
             }
-            //else
-            //{
-            //    EditorGUI.DrawRect(
-            //        rects.row,
-            //        new Color(.75f, .75f, .75f, .008f));
-            //}
 
             DrawButtons(index, rects, layerObj);
 
             // Draw label
-            Layer layer = null;
-            if (layerObj is Layer) layer = (Layer)layerObj;
-
             string label = layerObj.name;
-            if (layer != null && layer.InGroup)
-            {
-                label = "| " + label;
-            }
-
             GUI.Label(
                 new Rect(
                     rects.label.x + 4f,
                     rects.label.y,
                     rects.label.width - 8f,
                     rects.label.height),
-                    label);
+                label);
         }
 
         private static void HandleMouse(int index, RowRects rects, LayerObject layerObj, ref bool grouping)
@@ -157,10 +153,14 @@ namespace Haztech.SpriteEditor.Editor
 
             if (draggedId >= 0 && Event.current.type == EventType.MouseDrag)
             {
-                if (index != draggedId && rects.row.Contains(Event.current.mousePosition))
+                if (rects.row.Contains(Event.current.mousePosition))
                 {
-                    if (layerObj is Layer)
+                    if (layerObj is Layer layer)
                     {
+                        if (layer.InGroup)
+                            groupId = layer.Group.id;
+                        else
+                            groupId = -1;
                         //config.MoveLayer(draggedLayer, index);
 
                         //draggedLayer = index;
@@ -170,15 +170,13 @@ namespace Haztech.SpriteEditor.Editor
                     }
                     else if (layerObj is LayerGroup)
                     {
-                        grouping = true;
+                        groupId = index;
                     }
 
                     toolWindow.Repaint();
 
                     Event.current.Use();
                 }
-
-
             }
 
 
@@ -186,7 +184,7 @@ namespace Haztech.SpriteEditor.Editor
                 Event.current.type == EventType.MouseUp &&
                 rects.row.Contains(Event.current.mousePosition))
             {
-                if (index != draggedId)
+                if (index == groupId)
                 {
                     if (layerObj is LayerGroup group)
                     {
@@ -199,6 +197,7 @@ namespace Haztech.SpriteEditor.Editor
                 }
 
                 draggedId = -1;
+                groupId = -1;
                 Event.current.Use();
                 toolWindow.Repaint();
             }
@@ -221,7 +220,7 @@ namespace Haztech.SpriteEditor.Editor
                 toolWindow.Repaint();
             }
 
-            if (layerObj is LayerGroup group)
+            if (layerObj is LayerGroup group && !group.IsEmpty)
             {
                 bool expand = group.expanded;
                 expand = EditorGUI.Foldout(

@@ -6,10 +6,12 @@ namespace Haztech.SpriteEditor.Data
     [System.Serializable]
     public class LayerGroup : LayerObject
     {
+        public int id = 0;
         private SpriteConfig config;
         public bool expanded = false;
         [SerializeReference] private List<Layer> layers = new List<Layer>();
         public List<Layer> Layers => layers;
+        public bool IsEmpty => layers.Count == 0;
         public LayerGroup(string name, SpriteConfig config)
         {
             this.name = name;

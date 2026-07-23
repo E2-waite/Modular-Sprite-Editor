@@ -6,6 +6,7 @@ namespace Haztech.SpriteEditor.Data
     [System.Serializable]
     public class Layer : LayerObject
     {
+        public int id = 0; 
         private SpriteConfig config;
         public Color color = Color.white;
         public int colorGroupId = -1;

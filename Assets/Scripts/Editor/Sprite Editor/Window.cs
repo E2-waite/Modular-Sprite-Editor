@@ -7,12 +7,28 @@ namespace Haztech.SpriteEditor.Editor
 {
     public class Window : EditorWindow
     {
+        public static Window Instance { get; private set; }
+        public SpriteConfig SpriteConfig => config;
         [SerializeField] private SpriteConfig config;
         const string LastConfigKey = "ScriptEditor.LastConfig";
 
-        public SpriteConfig SpriteConfig => config;
+        private void OnEnable()
+        {
+            Instance = this;
 
-        [SerializeField] public static Window Instance;
+            string path = EditorPrefs.GetString(LastConfigKey, "");
+
+            if (!string.IsNullOrEmpty(path))
+            {
+                config = AssetDatabase.LoadAssetAtPath<SpriteConfig>(path);
+            }
+        }
+
+        private void OnDisable()
+        {
+            if (Instance == this)
+                Instance = null;
+        }
 
         [OnOpenAsset]
         public static bool OnOpenAsset(EntityId entityId, int line)
